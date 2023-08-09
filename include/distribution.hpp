@@ -12,7 +12,7 @@ class Distribution{
         int coords[3];
         int local_coords_start[3];
         MPI_Comm world_comm;
-        MPI_Comm distcomms[3];
+        MPI_Comm distcomms[4];
 
         cudaStream_t memcpystream;
 
@@ -34,6 +34,11 @@ class Distribution{
 
         void reshape_2(complexFFT_t* buff1, complexFFT_t* buff2);
         void unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2);
+
+        void reshape_3(complexFFT_t* buff1, complexFFT_t* buff2);
+        void unreshape_3(complexFFT_t* buff1, complexFFT_t* buff2);
+
+        void alltoall(complexFFT_t* src, size_t n_send, complexFFT_t* dest, size_t n_recv, MPI_Comm comm);
 
         int buffSize();
 };
