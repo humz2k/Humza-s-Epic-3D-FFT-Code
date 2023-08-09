@@ -1,5 +1,6 @@
 #include <mpi.h>
 #include "complex-type.hpp"
+#include <stdio.h>
 
 #define GPU
 //#define cudampi
