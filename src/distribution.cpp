@@ -109,6 +109,71 @@ void Distribution::unreshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
     }
 }
 
+void Distribution::reshape_2(complexFFT_t* buff1, complexFFT_t* buff2){
+    int n_recvs = dims[1];
+    int mini_pencil_size = local_grid_size[1];
+    int send_per_rank = nlocal / n_recvs;
+    //int pencils_per_rank = send_per_rank / mini_pencil_size;
+    //int n_per_local = local_grid_size[1] / n_recvs;
+    int n_slab = world_size / dims[2];
+    int n_divs = local_grid_size[0] / n_slab; 
+    for (int i = 0; i < nlocal; i++){
+
+        int rank = i / send_per_rank;
+        int sub_rank_idx = i % send_per_rank;
+        int div_id = sub_rank_idx / (send_per_rank / n_divs);
+        int sub_div_idx = sub_rank_idx % (send_per_rank / n_divs);
+
+        int x = sub_div_idx / mini_pencil_size;
+        int y = i % mini_pencil_size;
+        int z = div_id;
+
+        int new_idx = x;
+
+
+        //int rank =  i / send_per_rank;
+        //int div = (i % send_per_rank) / (send_per_rank / n_divs);
+        //int div_offset = div * local_grid_size[2];
+        //int pencil_id = i % mini_pencil_size + div * local_grid_size[2] * ng[1];
+        //int pencil_idx = ((i - (div * (send_per_rank / n_divs))) + rank * (send_per_rank / n_divs)) / mini_pencil_size;
+
+        //int new_idx = pencil_id * ng[1] + pencil_idx;
+        //int mini_pencil_id = i / mini_pencil_size;
+        //int rank = i / send_per_rank;
+
+        //int rank_offset = rank * mini_pencil_size;
+
+        //int pencil_offset = (mini_pencil_id % pencils_per_rank) * mini_pencil_size * n_recvs;
+
+        //int local_offset = i % mini_pencil_size;
+
+        //int new_idx = rank_offset + pencil_offset + local_offset;
+
+        buff2[new_idx] = buff1[i];
+    }
+}
+
+void Distribution::unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2){
+    int n_recvs = dims[1];
+    int mini_pencil_size = local_grid_size[1];
+    int send_per_rank = nlocal / n_recvs;
+    int pencils_per_rank = send_per_rank / mini_pencil_size;
+    for (int i = 0; i < nlocal; i++){
+        int mini_pencil_id = i / mini_pencil_size;
+        int rank = i / send_per_rank;
+
+        int rank_offset = rank * mini_pencil_size;
+
+        int pencil_offset = (mini_pencil_id % pencils_per_rank) * mini_pencil_size * n_recvs;
+
+        int local_offset = i % mini_pencil_size;
+
+        int new_idx = rank_offset + pencil_offset + local_offset;
+
+        buff2[i] = buff1[new_idx];
+    }
+}
+
 void Distribution::fillTest(complexFFT_t* buff){
     int i = 0;
     for (int x = local_coords_start[0]; x < local_grid_size[0] + local_coords_start[0]; x++){

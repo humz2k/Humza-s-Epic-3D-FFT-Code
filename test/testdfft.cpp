@@ -25,6 +25,10 @@ void test(int ngx, int ngy, int ngz, int blockSize){
 
     dist.printTest(buff1);
 
+    dist.reshape_2(buff1,buff2);
+
+    dist.printTest(buff2);
+
     //MPI_Alltoall(buff1,(dist.nlocal / (dist.dims[1] * dist.dims[0])) * sizeof(complexFFT_t),MPI_BYTE,buff2,(dist.nlocal / (dist.dims[1] * dist.dims[0])) * sizeof(complexFFT_t),MPI_BYTE,dist.distcomms[2]);
 
     //dist.printTest(buff2);

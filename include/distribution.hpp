@@ -32,5 +32,8 @@ class Distribution{
         void reshape_1(complexFFT_t* buff1, complexFFT_t* buff2);
         void unreshape_1(complexFFT_t* buff1, complexFFT_t* buff2);
 
+        void reshape_2(complexFFT_t* buff1, complexFFT_t* buff2);
+        void unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2);
+
         int buffSize();
 };
