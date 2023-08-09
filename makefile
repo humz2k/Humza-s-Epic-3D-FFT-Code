@@ -48,10 +48,10 @@ $(DFFT_BUILD_DIR):
 $(DFFT_GPU_LIB_DIR)/%.o: src/%.cpp | $(DFFT_LIB_DIR)
 	$(DFFT_MPI_CXX) $(DFFT_INCLUDE) -c -o $@ $<
 
-$(DFFT_CUDA_LIB_DIR)/%.o: src/*/*/%.cu | $(DFFT_LIB_DIR)
+$(DFFT_CUDA_LIB_DIR)/%.o: src/%.cu | $(DFFT_LIB_DIR)
 	$(DFFT_CUDA_CC) $(DFFT_INCLUDE) $(DFFT_CUDA_FLAGS) -c -o $@ $<
 
-$(DFFT_GPU_AR): $(DFFT_GPU_LIB_DIR)/distribution.o
+$(DFFT_GPU_AR): $(DFFT_GPU_LIB_DIR)/distribution.o $(DFFT_CUDA_LIB_DIR)/reshape.o $(DFFT_GPU_LIB_DIR)/dfft.o
 	ar cr $@ $^
 
 $(DFFT_BUILD_DIR)/testdfft: test/testdfft.cpp $(DFFT_GPU_AR) | $(DFFT_BUILD_DIR)
