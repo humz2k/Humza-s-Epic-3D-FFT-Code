@@ -119,7 +119,7 @@ void Distribution::pencils_2(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
     unreshape_2(buff1,buff2);
 
-    alltoall(buff2,buff1,(nlocal / (dims[1] * dims[0])),distcomms[2]);
+    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
 
     reshape_3(buff1,buff2);
 }
@@ -127,7 +127,7 @@ void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     unreshape_3(buff1,buff2);
 
-    alltoall(buff2,buff1,(nlocal / (dims[1] * dims[0])),distcomms[2]);
+    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
 
     alltoall(buff1,buff2,(nlocal / dims[1]),distcomms[1]);
 
@@ -323,4 +323,59 @@ void Distribution::printTest(complexFFT_t* buff){
     #ifdef GPU
     free(printBuff);
     #endif
+}
+
+void Distribution::runTest(complexFFT_t* buff1, complexFFT_t* buff2){
+
+    fillTest(buff1);
+
+    printTest(buff1);
+
+
+    alltoall(buff1,buff2,(nlocal / dims[2]),distcomms[0]);
+
+    reshape_1(buff2,buff1);
+
+
+    printTest(buff1);
+
+
+    unreshape_1(buff1,buff2);
+
+    alltoall(buff2,buff1,(nlocal / dims[1]),distcomms[1]);
+
+    reshape_2(buff1,buff2);
+
+
+    printTest(buff2);
+
+
+    unreshape_2(buff2,buff1);
+
+    printTest(buff1);
+
+    alltoall(buff1,buff2,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+
+    printTest(buff2);
+
+    reshape_3(buff2,buff1);
+
+
+    printTest(buff1);
+
+    unreshape_3(buff1,buff2);
+
+    printTest(buff2);
+
+    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+
+    printTest(buff1);
+
+    alltoall(buff1,buff2,(nlocal / dims[1]),distcomms[1]);
+
+    printTest(buff2);
+
+    alltoall(buff2,buff1,(nlocal / dims[2]),distcomms[0]);
+
+    printTest(buff1);
 }
