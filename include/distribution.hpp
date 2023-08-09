@@ -40,5 +40,8 @@ class Distribution{
 
         void alltoall(complexFFT_t* src, size_t n_send, complexFFT_t* dest, size_t n_recv, MPI_Comm comm);
 
+        template<class T>
+        void alltoall(T* src, T* dest, int n_recv, MPI_Comm comm);
+
         int buffSize();
 };

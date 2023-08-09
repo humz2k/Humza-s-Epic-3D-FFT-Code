@@ -78,6 +78,13 @@ void Distribution::alltoall(complexFFT_t* src, size_t n_send, complexFFT_t* dest
     MPI_Alltoall(src,n_send,MPI_BYTE,dest,n_recv,MPI_BYTE,comm);
 }
 
+template<class T>
+void Distribution::alltoall(T* src, T* dest, int n, MPI_Comm comm){
+    MPI_Alltoall(src,n * sizeof(T),MPI_BYTE,dest,n * sizeof(T),MPI_BYTE,comm);
+}
+
+template void Distribution::alltoall<complexFFT_t>(complexFFT_t*, complexFFT_t*, int, MPI_Comm);
+
 void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[2];
     int mini_pencil_size = local_grid_size[2];
