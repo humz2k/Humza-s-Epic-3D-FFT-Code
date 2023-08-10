@@ -194,6 +194,8 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     }
 
     cudaMemcpy(buff1,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
+
+    reshape_final(buff1,buff2,y_send,n_recvs / y_send);
 }
 
 void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
@@ -338,6 +340,14 @@ void Distribution::unreshape_3(complexFFT_t* buff1, complexFFT_t* buff2){
     #endif
 }
 
+void Distribution::reshape_final(complexFFT_t* buff1, complexFFT_t* buff2, int ny, int nz){
+    #ifdef GPU
+    launch_reshape_final(buff1,buff2,ny,nz,local_grid_size,nlocal,blockSize);
+    #else
+
+    #endif
+}
+
 void Distribution::fillTest(complexFFT_t* buff){
     int i = 0;
     for (int x = local_coords_start[0]; x < local_grid_size[0] + local_coords_start[0]; x++){
@@ -412,7 +422,11 @@ void Distribution::runTest(complexFFT_t* buff1, complexFFT_t* buff2){
 
     return_pencils(buff1,buff2);
 
-    printTest(buff1);
+    //printTest(buff1);
+
+    
+
+    printTest(buff2);
 
     /*unreshape_3(buff1,buff2);
 

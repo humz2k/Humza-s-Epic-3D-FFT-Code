@@ -83,6 +83,8 @@ class Distribution{
         void reshape_3(complexFFT_t* buff1, complexFFT_t* buff2);
         void unreshape_3(complexFFT_t* buff1, complexFFT_t* buff2);
 
+        void reshape_final(complexFFT_t* buff1, complexFFT_t* buff2, int ny, int nz);
+
         void runTest(complexFFT_t* buff1, complexFFT_t* buff2);
 
         template<class T>
