@@ -127,12 +127,97 @@ void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     unreshape_3(buff1,buff2);
 
-    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+    int dest_x_start = 0;
+    int dest_x_end = dims[0] - 1;
 
-    alltoall(buff1,buff2,(nlocal / dims[1]),distcomms[1]);
+    int dest_y_start = ((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) / local_grid_size[1];
+    int dest_y_end = ((coords[0] * dims[2] + coords[2] + 1) * (ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1];
 
-    alltoall(buff2,buff1,(nlocal / dims[2]),distcomms[0]);
+    int y_send = local_grid_size[1] / (ng[1] / (dims[0] * dims[2]));
+    int y_send_id = (((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) % local_grid_size[1]) / y_send;
+
+    int dest_z_start = (coords[1] * (ng[2] / dims[1])) / local_grid_size[2];
+    int dest_z_end = ((coords[1] + 1) * (ng[2] / dims[1]) - 1) / local_grid_size[2];
+
+    //int cy = coords[2] * local_grid_size[2] / (ng[2] / dims[1]);
+    //int cy2 = ((coords[2] - (((ng[2] / dims[1]) - 1) / local_grid_size[2])) * local_grid_size[2]) / (ng[2] / dims[1]);
+
+    //int cx = ((coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) / dims[2];
+    //int cz = ((coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) - cx * dims[2];
+    
+    //double tmp;
+    //tmp = ceil(((double)(coords[1] * local_grid_size[1] + 1)) / ((double)ng[1] / (double)(dims[0] * dims[2])));
+    //int cx2 = (tmp - 1) / dims[2];
+
+    int n_recvs = dims[0];
+    //int cz2 = cz + (dims[0] / ((cx2+1 - cx) * (cy2+1 - cy))) - 1;
+    //cz = world_rank / n_recvs;
+    //int cz2 = cz;
+
+    //int n_y_send = (ng[1] / (dims[0] * dims[2]));
+
+    if (world_rank == 0)printf("n_recvs = %d\n",n_recvs);
+
+    cudaMemcpy(h_buff2,buff2,sizeof(complexFFT_t)*nlocal,cudaMemcpyDeviceToHost);
+
+    //MPI_Barrier(world_comm);
+    MPI_Request reqs[n_recvs];
+    int count = 0;
+    for (int x = dest_x_start; x < dest_x_end+1; x++){
+        for (int y = dest_y_start; y < dest_y_end+1; y++){
+            for (int z = dest_z_start; z < dest_z_end+1; z++){
+                int dest = x*dims[1]*dims[2] + y*dims[2] + z;
+                MPI_Request req;
+                printf("rank %d [%d %d %d] send %d [%d %d %d]\n",world_rank,coords[0],coords[1],coords[2],dest,x,y,z);
+
+                //MPI_Sendrecv(&h_buff2[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,count,&h_buff1[count*(nlocal/n_recvs)],(nlocal/n_recvs)*sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,count,world_comm,MPI_STATUS_IGNORE);
+
+                MPI_Isend(&h_buff2[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,0,world_comm,&req);
+                MPI_Request_free(&req);
+                MPI_Irecv(&h_buff1[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,0,world_comm,&reqs[count]);
+                count++;
+                //printf("rank %d [%d %d %d]: send %d [%d %d %d] %d\n",world_rank,coords[0],coords[1],coords[2],x*dims[1]*dims[2] + y*dims[2] + z,x,y,z,y_send_id);
+            }
+        }
+    }
+
+    for (int i = 0; i < n_recvs; i++){
+        MPI_Wait(&reqs[i],MPI_STATUS_IGNORE);
+    }
+
+    cudaMemcpy(buff1,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
 }
+
+    //MPI_Barrier(world_comm);
+
+    /*count = 0;
+    MPI_Request reqs[n_recvs];
+    for (int x = cx; x < cx2+1; x++){
+        for (int y = cy; y < cy2 + 1; y++){
+            for (int z = cz; z < cz2 + 1; z++){
+                y_send_id = (((x * dims[2] + z) * (ng[1] / (dims[0] * dims[2]))) % local_grid_size[1]) / y_send;
+                int src = x*dims[1]*dims[2] + y*dims[2] + z;
+                printf("rank %d [%d %d %d] recv %d [%d %d %d]\n",world_rank,coords[0],coords[1],coords[2],src,x,y,z);
+                MPI_Irecv(&h_buff1[count * (nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,count,world_comm,&reqs[count]);
+                MPI_Wait(&reqs[count],MPI_STATUS_IGNORE);
+                count++;
+                //printf("rank %d [%d %d %d]: recv %d [%d %d %d] %d\n",world_rank,coords[0],coords[1],coords[2],x*dims[1]*dims[2] + y*dims[2] + z,x,y,z,y_send_id);
+            }
+        }
+    }
+
+    //for (int i = 0; i < n_recvs; i++){
+    //    MPI_Wait(&reqs[i],MPI_STATUS_IGNORE);
+    //}
+
+    cudaMemcpy(buff1,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
+
+    //alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+
+    //alltoall(buff1,buff2,(nlocal / dims[1]),distcomms[1]);
+
+    //alltoall(buff2,buff1,(nlocal / dims[2]),distcomms[0]);
+}*/
 
 void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[2];
@@ -332,50 +417,97 @@ void Distribution::runTest(complexFFT_t* buff1, complexFFT_t* buff2){
     printTest(buff1);
 
 
-    alltoall(buff1,buff2,(nlocal / dims[2]),distcomms[0]);
-
-    reshape_1(buff2,buff1);
+    pencils_1(buff1,buff2);
 
 
     printTest(buff1);
 
 
-    unreshape_1(buff1,buff2);
-
-    alltoall(buff2,buff1,(nlocal / dims[1]),distcomms[1]);
-
-    reshape_2(buff1,buff2);
+    pencils_2(buff1,buff2);
 
 
     printTest(buff2);
 
 
-    unreshape_2(buff2,buff1);
+    pencils_3(buff2,buff1);
 
     printTest(buff1);
 
-    alltoall(buff1,buff2,(nlocal / (dims[2] * dims[0])),distcomms[2]);
-
-    printTest(buff2);
-
-    reshape_3(buff2,buff1);
-
+    return_pencils(buff1,buff2);
 
     printTest(buff1);
 
-    unreshape_3(buff1,buff2);
+    /*unreshape_3(buff1,buff2);
 
-    printTest(buff2);
+    //printTest(buff2);
 
-    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+    int dest_x_start = 0;
+    int dest_x_end = dims[0] - 1;
 
-    printTest(buff1);
+    int dest_y_start = ((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) / local_grid_size[1];
+    int dest_y_end = ((coords[0] * dims[2] + coords[2] + 1) * (ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1];
 
-    alltoall(buff1,buff2,(nlocal / dims[1]),distcomms[1]);
+    int y_send = local_grid_size[1] / (ng[1] / (dims[0] * dims[2]));
+    int y_send_id = (((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) % local_grid_size[1]) / y_send;
 
-    printTest(buff2);
+    int dest_z_start = (coords[1] * (ng[2] / dims[1])) / local_grid_size[2];
+    int dest_z_end = ((coords[1] + 1) * (ng[2] / dims[1]) - 1) / local_grid_size[2];
 
-    alltoall(buff2,buff1,(nlocal / dims[2]),distcomms[0]);
+    int cy = coords[2] * local_grid_size[2] / (ng[2] / dims[1]);
+    int cy2 = ((coords[2] - (((ng[2] / dims[1]) - 1) / local_grid_size[2])) * local_grid_size[2]) / (ng[2] / dims[1]);
 
-    printTest(buff1);
+    int cx = ((coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) / dims[2];// / dims[2];
+    int cz = ((coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) - cx * dims[2];//(coords[1]) / ((ng[1] / (dims[0] * dims[2])) / local_grid_size[1]) - cx * dims[2];
+    
+    double tmp;
+    //(tmp * (ng[1]/(dims[0]*dims[2])) - 1) / local_grid_size[1];
+    tmp = ceil(((double)(coords[1] * local_grid_size[1] + 1)) / ((double)ng[1] / (double)(dims[0] * dims[2])));//(coords[1] * local_grid_size[1] + 1) / (ng[1] / (dims[0] * dims[2]));
+    int cx2 = (tmp - 1) / dims[2];
+    //(((coords[1] - (((ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1])) * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) / dims[2];
+    
+    int n_recvs = dims[0];
+    int cz2 = cz + (dims[0] / (cx2+1 - cx) * (cy2+1 - cy)) - 1;
+
+    //;(((coords[1] * local_grid_size[1] + 1) / (ng[1] / (dims[0] * dims[2]))) - 1) / dims[2];
+   //int cz2 = cz + 1;//
+    //(((coords[1] - (((ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1])) * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2])));//(((coords[1] - (((ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1])) * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) - cx2 * dims[2];//((((coords[1] * local_grid_size[1] + 1) / (ng[1] / (dims[0] * dims[2])))) - cx2 * dims[2]);
+    /*
+    (coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2])) = (cx * dims[2] + cz);
+    world_rank = 
+
+    
+
+    int n_y_send = (ng[1] / (dims[0] * dims[2]));
+
+    //if(world_rank == 0)printf("n_y_send %d\n",n_y_send);
+
+    //if (world_rank == 2){
+        //printf("[%d %d], [%d %d], [%d %d]\n",dest_x_start,dest_x_end,dest_y_start,dest_y_end,dest_z_start,dest_z_end);
+        //printf("%d\n",y_send_id);
+    //MPI_Barrier(MPI_COMM_WORLD);
+    for (int rank = 0; rank < world_size; rank++){
+        if (rank == world_rank){
+            for (int x = dest_x_start; x < dest_x_end+1; x++){
+                for (int y = dest_y_start; y < dest_y_end+1; y++){
+                    for (int z = dest_z_start; z < dest_z_end+1; z++){
+                        int dest = x*dims[1]*dims[2] + y*dims[2] + z;
+                        //printf("rank %d [%d %d %d]: send %d [%d %d %d] %d\n",world_rank,coords[0],coords[1],coords[2],x*dims[1]*dims[2] + y*dims[2] + z,x,y,z,y_send_id);
+                    }
+                }
+            }
+            for (int x = cx; x < cx2+1; x++){
+                for (int y = cy; y < cy2 + 1; y++){
+                    for (int z = cz; z < cz2 + 1; z++){
+                        y_send_id = (((x * dims[2] + z) * (ng[1] / (dims[0] * dims[2]))) % local_grid_size[1]) / y_send;
+                        int src = x*dims[1]*dims[2] + y*dims[2] + z;
+                        //printf("rank %d [%d %d %d]: recv %d [%d %d %d] %d\n",world_rank,coords[0],coords[1],coords[2],x*dims[1]*dims[2] + y*dims[2] + z,x,y,z,y_send_id);
+                    }
+                }
+            }
+            //printf("rank %d [%d %d %d]: recv [%d %d] [%d %d] [%d %d]\n",world_rank,coords[0],coords[1],coords[2],cx,cx2,cy,cy2,cz,cz2);
+        }
+        //MPI_Barrier(MPI_COMM_WORLD);
+    }*/
+    //}
+
 }
