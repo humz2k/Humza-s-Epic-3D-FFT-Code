@@ -49,7 +49,7 @@ void Dfft::fft(int direction){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     #endif
 
     dist.pencils_2(buff2,buff1);
@@ -60,7 +60,7 @@ void Dfft::fft(int direction){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     #endif
 
     dist.pencils_3(buff2,buff1);
@@ -71,7 +71,7 @@ void Dfft::fft(int direction){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     #endif
 
     dist.return_pencils(buff2,buff1);

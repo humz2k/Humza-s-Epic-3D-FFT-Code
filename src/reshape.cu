@@ -22,7 +22,7 @@ __global__ void reshape_kernel(const complexFFT_t* __restrict buff1, complexFFT_
 void launch_reshape(complexFFT_t* buff1, complexFFT_t* buff2, int n_recvs, int mini_pencil_size, int send_per_rank, int pencils_per_rank, int nlocal, int blockSize){
     int numBlocks = (nlocal + (blockSize - 1))/blockSize;
     reshape_kernel<<<numBlocks,blockSize>>>(buff1,buff2,n_recvs,mini_pencil_size,send_per_rank,pencils_per_rank,nlocal);
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
 }
 
 __global__ void unreshape_kernel(const complexFFT_t* __restrict buff1, complexFFT_t* __restrict buff2, int z_dim, int x_dim, int y_dim, int nlocal){
@@ -40,7 +40,7 @@ __global__ void unreshape_kernel(const complexFFT_t* __restrict buff1, complexFF
 void launch_unreshape(complexFFT_t* buff1, complexFFT_t* buff2, int z_dim, int x_dim, int y_dim, int nlocal, int blockSize){
     int numBlocks = (nlocal + (blockSize - 1))/blockSize;
     unreshape_kernel<<<numBlocks,blockSize>>>(buff1,buff2,z_dim,x_dim,y_dim,nlocal);
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
 }
 
 __global__ void reshape_final_kernel(const complexFFT_t* __restrict buff1, complexFFT_t* __restrict buff2, int ny, int nz, int3 local_grid_size, int nlocal){
@@ -81,6 +81,6 @@ void launch_reshape_final(complexFFT_t* buff1, complexFFT_t* buff2, int ny, int 
     int numBlocks = (nlocal + (blockSize - 1))/blockSize;
     int3 local_grid_size_vec = make_int3(local_grid_size[0],local_grid_size[1],local_grid_size[2]);
     reshape_final_kernel<<<numBlocks,blockSize>>>(buff1,buff2,ny,nz,local_grid_size_vec,nlocal);
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     
 }
