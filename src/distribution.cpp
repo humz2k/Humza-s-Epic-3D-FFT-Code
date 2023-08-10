@@ -8,18 +8,18 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
 
     MPI_Dims_create(world_size,3,dims);
 
-    local_grid_size[0] = ng[0] / dims[0];
-    local_grid_size[1] = ng[1] / dims[1];
-    local_grid_size[2] = ng[2] / dims[2];
+    local_grid_size[0] = (ng[0] + (dims[0] - 1)) / dims[0];
+    local_grid_size[1] = (ng[1] + (dims[1] - 1)) / dims[1];
+    local_grid_size[2] = (ng[2] + (dims[2] - 1)) / dims[2];
 
-    if ((ng[0] % dims[0] != 0) ||
+    /*if ((ng[0] % dims[0] != 0) ||
         (ng[1] % dims[1] != 0) ||
         (ng[2] % dims[2] != 0)){
             if(world_rank == 0){
                 printf("INVALID DIMENSIONS: ng = [%d %d %d] | dims = [%d %d %d]\n",ng[0],ng[1],ng[2],dims[0],dims[1],dims[2]);
                 MPI_Abort(MPI_COMM_WORLD,1);
             }
-        }
+        }*/
 
     nlocal = local_grid_size[0] * local_grid_size[1] * local_grid_size[2];
 
@@ -114,7 +114,7 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
         printf("   dims            = [%d %d %d]\n",dims[0],dims[1],dims[2]);
         printf("   local_grid_size = [%d %d %d]\n",local_grid_size[0],local_grid_size[1],local_grid_size[2]);
         printf("   nlocal          =  %d\n",nlocal);
-        printf("   buff_sz         =  %d (+%g\%)\n",buff_sz,((double)(buff_sz - nlocal)) / (double)(nlocal));
+        printf("   buff_sz         =  %d (+%g%%)\n",buff_sz,((double)(buff_sz - nlocal)) / (double)(nlocal));
         printf("   blockSize       =  %d\n",blockSize);
         printf("   world_size      =  %d\n",world_size);
         
@@ -163,9 +163,9 @@ Distribution::~Distribution(){
 template<class T>
 void Distribution::alltoall(T* src, T* dest, int n, MPI_Comm comm){
     #if defined(GPU) && !defined(cudampi)
-    cudaMemcpy(h_buff1,src,nlocal * sizeof(T),cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_buff1,src,buff_sz * sizeof(T),cudaMemcpyDeviceToHost);
     MPI_Alltoall(h_buff1,n * sizeof(T),MPI_BYTE,h_buff2,n * sizeof(T),MPI_BYTE,comm);
-    cudaMemcpy(dest,h_buff2,nlocal * sizeof(T),cudaMemcpyHostToDevice);
+    cudaMemcpy(dest,h_buff2,buff_sz * sizeof(T),cudaMemcpyHostToDevice);
     #else
     MPI_Alltoall(src,n * sizeof(T),MPI_BYTE,dest,n * sizeof(T),MPI_BYTE,comm);
     #endif
@@ -175,6 +175,8 @@ template void Distribution::alltoall<complexFFT_t>(complexFFT_t*, complexFFT_t*,
 
 void Distribution::pencils_1(complexFFT_t* buff1, complexFFT_t* buff2){
 
+    if(world_rank == 0)printf("pencils_1()\n");
+
     //cudaDeviceSynchronize();
 
     alltoall(buff1,buff2,((nlocal + (dims[2] - 1)) / dims[2]),distcomms[0]);
@@ -183,6 +185,9 @@ void Distribution::pencils_1(complexFFT_t* buff1, complexFFT_t* buff2){
 }
 
 void Distribution::pencils_2(complexFFT_t* buff1, complexFFT_t* buff2){
+
+    if(world_rank == 0)printf("pencils_2()\n");
+
     unreshape_1(buff1,buff2);
 
     cudaDeviceSynchronize();
@@ -193,6 +198,9 @@ void Distribution::pencils_2(complexFFT_t* buff1, complexFFT_t* buff2){
 }
 
 void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
+
+    if(world_rank == 0)printf("pencils_3()\n");
+
     unreshape_2(buff1,buff2);
 
     cudaDeviceSynchronize();
@@ -204,6 +212,8 @@ void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
 
 void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     unreshape_3(buff1,buff2);
+
+    if(world_rank == 0)printf("return_pencils()\n");
 
     int dest_x_start = 0;
     int dest_x_end = dims[0] - 1;
@@ -277,12 +287,13 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[2];
     int mini_pencil_size = local_grid_size[2];
-    int send_per_rank = nlocal / n_recvs;
+    int send_per_rank = (nlocal + (n_recvs - 1)) / n_recvs;
     int pencils_per_rank = send_per_rank / mini_pencil_size;
+    assert((send_per_rank % mini_pencil_size) == 0);
     #ifdef GPU
-    launch_reshape(buff1,buff2,n_recvs,mini_pencil_size,send_per_rank,pencils_per_rank,nlocal,blockSize);
+    launch_reshape(buff1,buff2,n_recvs,mini_pencil_size,send_per_rank,pencils_per_rank,send_per_rank * n_recvs,blockSize);
     #else
-    for (int i = 0; i < nlocal; i++){
+    for (int i = 0; i < send_per_rank * n_recvs; i++){
         int mini_pencil_id = i / mini_pencil_size;
         int rank = i / send_per_rank;
 
@@ -302,8 +313,8 @@ void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::unreshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
 
     int z_dim = ng[2];
-    int x_dim = local_grid_size[0] / dims[2];
-    int y_dim = (nlocal / z_dim) / x_dim;
+    int x_dim = (local_grid_size[0] + (dims[2] - 1)) / dims[2];
+    int y_dim = (((nlocal + (z_dim - 1)) / z_dim) + (x_dim - 1)) / x_dim;
 
     #ifdef GPU
     launch_unreshape(buff1,buff2,z_dim,x_dim,y_dim,nlocal,blockSize);
@@ -322,8 +333,11 @@ void Distribution::unreshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::reshape_2(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[1];
     int mini_pencil_size = local_grid_size[1];
-    int send_per_rank = nlocal / n_recvs;
+    int send_per_rank = (nlocal + (n_recvs - 1)) / n_recvs;
     int pencils_per_rank = send_per_rank / mini_pencil_size;
+
+    assert(send_per_rank % mini_pencil_size == 0);
+
     #ifdef GPU
     launch_reshape(buff1,buff2,n_recvs,mini_pencil_size,send_per_rank,pencils_per_rank,nlocal,blockSize);
     #else
@@ -351,8 +365,8 @@ void Distribution::unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2){
     //int send_per_rank = nlocal / n_sends;
 
     int z_dim = ng[1];
-    int x_dim = local_grid_size[2] / dims[1];
-    int y_dim = (nlocal / z_dim) / x_dim;
+    int x_dim = (local_grid_size[2] + (dims[1] - 1)) / dims[1];
+    int y_dim = (((nlocal + (z_dim - 1)) / z_dim) + (x_dim - 1)) / x_dim;
 
     #ifdef GPU
     launch_unreshape(buff1,buff2,z_dim,x_dim,y_dim,nlocal,blockSize);
@@ -370,7 +384,7 @@ void Distribution::unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2){
     }
     #endif
 }
-
+//FINISH ME
 void Distribution::reshape_3(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[0] * dims[2];
     int mini_pencil_size = ng[0] / n_recvs;
