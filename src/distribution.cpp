@@ -12,6 +12,15 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
     local_grid_size[1] = ng[1] / dims[1];
     local_grid_size[2] = ng[2] / dims[2];
 
+    if ((ng[0] % dims[0] != 0) ||
+        (ng[1] % dims[1] != 0) ||
+        (ng[2] % dims[2] != 0)){
+            if(world_rank == 0){
+                printf("INVALID DIMENSIONS: ng = [%d %d %d] | dims = [%d %d %d]\n",ng[0],ng[1],ng[2],dims[0],dims[1],dims[2]);
+                MPI_Abort(MPI_COMM_WORLD,1);
+            }
+        }
+
     nlocal = local_grid_size[0] * local_grid_size[1] * local_grid_size[2];
 
     coords[0] = world_rank / (dims[1] * dims[2]);
@@ -22,7 +31,7 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
     local_coords_start[1] = local_grid_size[1] * coords[1];
     local_coords_start[2] = local_grid_size[2] * coords[2];
 
-    if (world_rank == 0){
+    /*if (world_rank == 0){
         printf("Distribution:\n");
         printf("   ng              = [%d %d %d]\n",ng[0],ng[1],ng[2]);
         printf("   dims            = [%d %d %d]\n",dims[0],dims[1],dims[2]);
@@ -31,7 +40,7 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
         printf("   blockSize       = %d\n",blockSize);
         printf("   world_size      = %d\n",world_size);
         
-    }
+    }*/
 
     MPI_Comm z_col_comm;
 
@@ -60,11 +69,73 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
 
     distcomms[2] = x_col_comm;
 
-    assert(local_grid_size[0] % dims[2] == 0);
-    assert(local_grid_size[2] % dims[1] == 0);
-    assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
-    assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
-    assert(ng[2] % (dims[0] * dims[2]) == 0);
+    int pad_size[3];
+    pad_size[0] = local_grid_size[0];
+    pad_size[1] = local_grid_size[1];
+    pad_size[2] = local_grid_size[2];
+
+    buff_sz = nlocal;
+
+    if (local_grid_size[0] % dims[2] != 0){
+        if(world_rank == 0)printf("\nCONDITION::local_grid_size[0] mod dims[2] != 0\n");
+        int this_pad = ((local_grid_size[0] + (dims[2] - 1)) / dims[2]) * dims[2];
+        int needed_size = local_grid_size[1] * local_grid_size[2] * this_pad;
+        if (buff_sz < needed_size){
+            buff_sz = needed_size;
+        }
+    }
+
+    if (local_grid_size[2] % dims[1] != 0){
+        if(world_rank == 0)printf("\nCONDITION::pad_size[2] mod dims[1] != 0\n");
+        int this_pad = ((local_grid_size[2] + (dims[1] - 1)) / dims[1]) * dims[1];
+        int needed_size = this_pad * local_grid_size[0] * local_grid_size[1];
+        if (buff_sz < needed_size){
+            buff_sz = needed_size;
+        }
+        //if(world_rank == 0)MPI_Abort(MPI_COMM_WORLD,1);
+    }
+
+    if (ng[2] % (dims[0] * dims[2]) != 0){
+        if(world_rank == 0)printf("\nCONDITION::ng[2] mod (dims[0] * dims[2]) != 0\n");
+        int pad_ng = ((ng[2] + (dims[0] * dims[2] - 1)) / (dims[0] * dims[2])) * dims[0] * dims[2];
+        int this_pad = pad_ng / dims[2];
+        int needed_size = this_pad * local_grid_size[0] * local_grid_size[1];
+        if (buff_sz < needed_size){
+            buff_sz = needed_size;
+        }
+        //printf("pad_ng %d\n",pad_ng);
+        //if(world_rank == 0)MPI_Abort(MPI_COMM_WORLD,1);
+    }
+
+    //if(world_rank == 0)printf("\nnlocal = %d\nbuff_sz = %d\nmem_increase",nlocal,buff_sz);
+    if (world_rank == 0){
+        printf("Distribution:\n");
+        printf("   ng              = [%d %d %d]\n",ng[0],ng[1],ng[2]);
+        printf("   dims            = [%d %d %d]\n",dims[0],dims[1],dims[2]);
+        printf("   local_grid_size = [%d %d %d]\n",local_grid_size[0],local_grid_size[1],local_grid_size[2]);
+        printf("   nlocal          =  %d\n",nlocal);
+        printf("   buff_sz         =  %d (+%g\%)\n",buff_sz,((double)(buff_sz - nlocal)) / (double)(nlocal));
+        printf("   blockSize       =  %d\n",blockSize);
+        printf("   world_size      =  %d\n",world_size);
+        
+    }
+    MPI_Barrier(world_comm);
+
+    //assert(padded_size % dims[2] == 0);
+    //assert(padded_size % dims[1] == 0);
+    //assert(padded_size % (dims[0] * dims[2]) == 0);
+
+    //assert((padded_size / dims[2]) % ng[2] == 0);
+    //assert((padded_size / dims[1]) % ng[1] == 0);
+    //assert((padded_size / (dims[0] * dims[2])) % ng[0] == 0);
+
+    //assert(ng[2] % dims[1] == 0);
+
+    //assert(local_grid_size[0] % dims[2] == 0);
+    //assert(local_grid_size[2] % dims[1] == 0);
+    //assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
+    //assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
+    //assert(ng[2] % (dims[0] * dims[2]) == 0);
 
     #ifdef GPU
     #ifndef cudampi
@@ -77,7 +148,7 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
 }
 
 int Distribution::buffSize(){
-    return nlocal;
+    return buff_sz;
 }
 
 Distribution::~Distribution(){
@@ -106,7 +177,7 @@ void Distribution::pencils_1(complexFFT_t* buff1, complexFFT_t* buff2){
 
     //cudaDeviceSynchronize();
 
-    alltoall(buff1,buff2,(nlocal / dims[2]),distcomms[0]);
+    alltoall(buff1,buff2,((nlocal + (dims[2] - 1)) / dims[2]),distcomms[0]);
 
     reshape_1(buff2,buff1);
 }
@@ -116,7 +187,7 @@ void Distribution::pencils_2(complexFFT_t* buff1, complexFFT_t* buff2){
 
     cudaDeviceSynchronize();
 
-    alltoall(buff2,buff1,(nlocal / dims[1]),distcomms[1]);
+    alltoall(buff2,buff1,((nlocal + (dims[1] - 1)) / dims[1]),distcomms[1]);
 
     reshape_2(buff1,buff2);
 }
@@ -126,7 +197,7 @@ void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
 
     cudaDeviceSynchronize();
 
-    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+    alltoall(buff2,buff1,((nlocal + ((dims[2] * dims[0]) - 1)) / (dims[2] * dims[0])),distcomms[2]);
 
     reshape_3(buff1,buff2);
 }
