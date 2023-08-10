@@ -144,6 +144,8 @@ void test(int ngx, int ngy, int ngz, int blockSize, int reps){
 
     dfft.makePlans(buff1,buff2);
 
+    //dist.runTest(buff1,buff2);
+
     for (int i = 0; i < reps; i++){
         if(dist.world_rank == 0)printf("\n\nRep %d/%d\n\n",i+1,reps);
         dfft.fillDelta();
