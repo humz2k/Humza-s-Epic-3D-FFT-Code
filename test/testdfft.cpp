@@ -141,12 +141,8 @@ void test(int ngx, int ngy, int ngz, int blockSize, int reps){
 
     complexFFT_t* buff1; cudaMalloc(&buff1,sizeof(complexFFT_t)*dist.buffSize());
     complexFFT_t* buff2; cudaMalloc(&buff2,sizeof(complexFFT_t)*dist.buffSize());
-    // = (complexFFT_t*)malloc(sizeof(complexFFT_t) * dist.buffSize());
-    //complexFFT_t* buff2 = (complexFFT_t*)malloc(sizeof(complexFFT_t) * dist.buffSize());
 
     dfft.makePlans(buff1,buff2);
-
-    //dist.runTest(buff1,buff2);
 
     for (int i = 0; i < reps; i++){
         if(dist.world_rank == 0)printf("\n\nRep %d/%d\n\n",i+1,reps);
@@ -167,18 +163,24 @@ void test(int ngx, int ngy, int ngz, int blockSize, int reps){
 
 int main(int argc, char** argv){
 
+    #ifdef GPU
+    cudaFree(0);
+    #endif
+
     MPI_Init(NULL,NULL);
     int ng;
     int reps;
-    if (argc == 3){
-        ng = atoi(argv[1]);
-        reps = atoi(argv[2]);
+    int blockSize;
+    if (argc == 4){
+        ng = atoi(argv[3]);
+        reps = atoi(argv[1]);
+        blockSize = atoi(argv[2]);
     } else{
-        printf("USAGE: %s <ng> <reps>\n",argv[0]);
+        printf("USAGE: %s <reps> <blockSize> <ng>\n",argv[0]);
         return 0;
     }
 
-    test(ng,ng,ng,64,reps);
+    test(ng,ng,ng,blockSize,reps);
 
     MPI_Finalize();
     return 0;
