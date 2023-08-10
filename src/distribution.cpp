@@ -171,8 +171,8 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
 
                 int xoff = 0;
                 //int yoff = (count - (count / dims[0])*dims[0]) * (ng[1] / (dims[0] * dims[2]));
-                int yoff = tmp1 * (ng[1] / (dims[0] * dims[2]));
-                int zoff = (count - tmp1 * y_send) * (ng[2] / dims[1]);//(count - (count / dims[2])*dims[2]) ;
+                int yoff = (count - tmp1 * y_send) * (ng[1] / (dims[0] * dims[2]));
+                int zoff = tmp1 * (ng[2] / dims[1]);//(count - (count / dims[2])*dims[2]) ;
 
                 int xrec = local_grid_size[0] * coords[0] + xoff;
                 int yrec = local_grid_size[1] * coords[1] + yoff;
