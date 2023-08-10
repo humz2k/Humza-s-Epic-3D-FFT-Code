@@ -130,55 +130,63 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     int dest_x_start = 0;
     int dest_x_end = dims[0] - 1;
 
-    int dest_y_start = ((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) / local_grid_size[1];
-    int dest_y_end = ((coords[0] * dims[2] + coords[2] + 1) * (ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1];
+    int y = ((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) / local_grid_size[1];
+    //int dest_y_end = ((coords[0] * dims[2] + coords[2] + 1) * (ng[1] / (dims[0] * dims[2])) - 1) / local_grid_size[1];
 
     int y_send = local_grid_size[1] / (ng[1] / (dims[0] * dims[2]));
     int y_send_id = (((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2]))) % local_grid_size[1]) / y_send;
 
-    int dest_z_start = (coords[1] * (ng[2] / dims[1])) / local_grid_size[2];
-    int dest_z_end = ((coords[1] + 1) * (ng[2] / dims[1]) - 1) / local_grid_size[2];
-
-    //int cy = coords[2] * local_grid_size[2] / (ng[2] / dims[1]);
-    //int cy2 = ((coords[2] - (((ng[2] / dims[1]) - 1) / local_grid_size[2])) * local_grid_size[2]) / (ng[2] / dims[1]);
-
-    //int cx = ((coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) / dims[2];
-    //int cz = ((coords[1] * local_grid_size[1]) / (ng[1] / (dims[0] * dims[2]))) - cx * dims[2];
-    
-    //double tmp;
-    //tmp = ceil(((double)(coords[1] * local_grid_size[1] + 1)) / ((double)ng[1] / (double)(dims[0] * dims[2])));
-    //int cx2 = (tmp - 1) / dims[2];
+    int z = (coords[1] * (ng[2] / dims[1])) / local_grid_size[2];
+    //int dest_z_end = ((coords[1] + 1) * (ng[2] / dims[1]) - 1) / local_grid_size[2];
 
     int n_recvs = dims[0];
-    //int cz2 = cz + (dims[0] / ((cx2+1 - cx) * (cy2+1 - cy))) - 1;
-    //cz = world_rank / n_recvs;
-    //int cz2 = cz;
-
-    //int n_y_send = (ng[1] / (dims[0] * dims[2]));
 
     if (world_rank == 0)printf("n_recvs = %d\n",n_recvs);
 
     cudaMemcpy(h_buff2,buff2,sizeof(complexFFT_t)*nlocal,cudaMemcpyDeviceToHost);
 
-    //MPI_Barrier(world_comm);
     MPI_Request reqs[n_recvs];
     int count = 0;
     for (int x = dest_x_start; x < dest_x_end+1; x++){
-        for (int y = dest_y_start; y < dest_y_end+1; y++){
-            for (int z = dest_z_start; z < dest_z_end+1; z++){
+        //for (int y = dest_y_start; y < dest_y_end+1; y++){
+        //    for (int z = dest_z_start; z < dest_z_end+1; z++){
                 int dest = x*dims[1]*dims[2] + y*dims[2] + z;
                 MPI_Request req;
-                printf("rank %d [%d %d %d] send %d [%d %d %d]\n",world_rank,coords[0],coords[1],coords[2],dest,x,y,z);
 
-                //MPI_Sendrecv(&h_buff2[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,count,&h_buff1[count*(nlocal/n_recvs)],(nlocal/n_recvs)*sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,count,world_comm,MPI_STATUS_IGNORE);
+                int reqidx = x - dest_x_start;
+                //int reqidy = y - dest_y_start;
+                int nx = (dest_x_end+1) - dest_x_start;
+                int ny = n_recvs / nx;
+                //printf("nx %d,ny %d\n",nx,ny);
 
-                MPI_Isend(&h_buff2[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,0,world_comm,&req);
+                //int reqid = reqidx * ny + (count % ny);
+
+                //int reqid1 = reqidx * ny + y_send_id;
+                int xsrc = x * local_grid_size[0];
+                int ysrc = ((coords[0] * dims[2] + coords[2]) * (ng[1] / (dims[0] * dims[2])));
+                int zsrc = (coords[1] * (ng[2] / dims[1]));
+                int id = xsrc * local_grid_size[1] * local_grid_size[2] + ysrc * local_grid_size[2] + zsrc;
+
+                int tmp1 = count / y_send;
+
+                int xoff = 0;
+                //int yoff = (count - (count / dims[0])*dims[0]) * (ng[1] / (dims[0] * dims[2]));
+                int yoff = tmp1 * (ng[1] / (dims[0] * dims[2]));
+                int zoff = (count - tmp1 * y_send) * (ng[2] / dims[1]);//(count - (count / dims[2])*dims[2]) ;
+
+                int xrec = local_grid_size[0] * coords[0] + xoff;
+                int yrec = local_grid_size[1] * coords[1] + yoff;
+                int zrec = local_grid_size[2] * coords[2] + zoff;
+                int recid = xrec * local_grid_size[1] * local_grid_size[2] + yrec * local_grid_size[2] + zrec;
+
+                printf("rank %d [%d %d %d] send rank %d :: %d %d %d :: %d %d %d :: %d %d %d -> (%d) (%d)\n",world_rank,coords[0],coords[1],coords[2],dest,xsrc,ysrc,zsrc,xoff,yoff,zoff,xrec,yrec,zrec,id,recid);
+
+                MPI_Isend(&h_buff2[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,id,world_comm,&req);
                 MPI_Request_free(&req);
-                MPI_Irecv(&h_buff1[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,0,world_comm,&reqs[count]);
+                MPI_Irecv(&h_buff1[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,recid,world_comm,&reqs[count]);
                 count++;
-                //printf("rank %d [%d %d %d]: send %d [%d %d %d] %d\n",world_rank,coords[0],coords[1],coords[2],x*dims[1]*dims[2] + y*dims[2] + z,x,y,z,y_send_id);
-            }
-        }
+            //}
+        //}
     }
 
     for (int i = 0; i < n_recvs; i++){
@@ -187,37 +195,6 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
 
     cudaMemcpy(buff1,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
 }
-
-    //MPI_Barrier(world_comm);
-
-    /*count = 0;
-    MPI_Request reqs[n_recvs];
-    for (int x = cx; x < cx2+1; x++){
-        for (int y = cy; y < cy2 + 1; y++){
-            for (int z = cz; z < cz2 + 1; z++){
-                y_send_id = (((x * dims[2] + z) * (ng[1] / (dims[0] * dims[2]))) % local_grid_size[1]) / y_send;
-                int src = x*dims[1]*dims[2] + y*dims[2] + z;
-                printf("rank %d [%d %d %d] recv %d [%d %d %d]\n",world_rank,coords[0],coords[1],coords[2],src,x,y,z);
-                MPI_Irecv(&h_buff1[count * (nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,count,world_comm,&reqs[count]);
-                MPI_Wait(&reqs[count],MPI_STATUS_IGNORE);
-                count++;
-                //printf("rank %d [%d %d %d]: recv %d [%d %d %d] %d\n",world_rank,coords[0],coords[1],coords[2],x*dims[1]*dims[2] + y*dims[2] + z,x,y,z,y_send_id);
-            }
-        }
-    }
-
-    //for (int i = 0; i < n_recvs; i++){
-    //    MPI_Wait(&reqs[i],MPI_STATUS_IGNORE);
-    //}
-
-    cudaMemcpy(buff1,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
-
-    //alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
-
-    //alltoall(buff1,buff2,(nlocal / dims[1]),distcomms[1]);
-
-    //alltoall(buff2,buff1,(nlocal / dims[2]),distcomms[0]);
-}*/
 
 void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[2];
