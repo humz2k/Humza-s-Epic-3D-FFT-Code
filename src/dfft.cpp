@@ -45,18 +45,18 @@ void Dfft::fft(int direction){
 
     //dist.printTest(buff1);
     #ifdef GPU
-    if (cufftExecZ2Z(plan, buff1, buff1, direction) != CUFFT_SUCCESS){
+    if (cufftExecZ2Z(plan, buff1, buff2, direction) != CUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
     cudaDeviceSynchronize();
     #endif
 
-    dist.pencils_2(buff1,buff2);
+    dist.pencils_2(buff2,buff1);
 
     //dist.printTest(buff2);
     #ifdef GPU
-    if (cufftExecZ2Z(plan, buff2, buff2, direction) != CUFFT_SUCCESS){
+    if (cufftExecZ2Z(plan, buff1, buff2, direction) != CUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
@@ -67,14 +67,14 @@ void Dfft::fft(int direction){
 
     //dist.printTest(buff1);
     #ifdef GPU
-    if (cufftExecZ2Z(plan, buff1, buff1, direction) != CUFFT_SUCCESS){
+    if (cufftExecZ2Z(plan, buff1, buff2, direction) != CUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
     cudaDeviceSynchronize();
     #endif
 
-    dist.return_pencils(buff1,buff2);
+    dist.return_pencils(buff2,buff1);
     //dist.printTest(buff1);
 }
 

@@ -141,7 +141,7 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
 
     int n_recvs = dims[0];
 
-    if (world_rank == 0)printf("n_recvs = %d\n",n_recvs);
+    //if (world_rank == 0)printf("n_recvs = %d\n",n_recvs);
 
     cudaMemcpy(h_buff2,buff2,sizeof(complexFFT_t)*nlocal,cudaMemcpyDeviceToHost);
 
@@ -179,7 +179,7 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
                 int zrec = local_grid_size[2] * coords[2] + zoff;
                 int recid = xrec * local_grid_size[1] * local_grid_size[2] + yrec * local_grid_size[2] + zrec;
 
-                printf("rank %d [%d %d %d] send rank %d :: %d %d %d :: %d %d %d :: %d %d %d -> (%d) (%d)\n",world_rank,coords[0],coords[1],coords[2],dest,xsrc,ysrc,zsrc,xoff,yoff,zoff,xrec,yrec,zrec,id,recid);
+                //printf("rank %d [%d %d %d] send rank %d :: %d %d %d :: %d %d %d :: %d %d %d -> (%d) (%d)\n",world_rank,coords[0],coords[1],coords[2],dest,xsrc,ysrc,zsrc,xoff,yoff,zoff,xrec,yrec,zrec,id,recid);
 
                 MPI_Isend(&h_buff2[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,id,world_comm,&req);
                 MPI_Request_free(&req);
