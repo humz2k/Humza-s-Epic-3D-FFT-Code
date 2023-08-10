@@ -34,3 +34,6 @@
 *.txt
 
 *.ipynb
+
+build
+lib
