@@ -1,4 +1,5 @@
 #include "reshape.hpp"
+#include <cassert>
 
 __global__ void reshape_kernel(const complexFFT_t* __restrict buff1, complexFFT_t* __restrict buff2, int n_recvs, int mini_pencil_size, int send_per_rank, int pencils_per_rank, int nlocal){
     int i = threadIdx.x+blockDim.x*blockIdx.x;
@@ -80,6 +81,8 @@ __global__ void reshape_final_kernel(const complexFFT_t* __restrict buff1, compl
 void launch_reshape_final(complexFFT_t* buff1, complexFFT_t* buff2, int ny, int nz, int local_grid_size[], int nlocal, int blockSize){
     int numBlocks = (nlocal + (blockSize - 1))/blockSize;
     int3 local_grid_size_vec = make_int3(local_grid_size[0],local_grid_size[1],local_grid_size[2]);
+    //assert(local_grid_size_vec.y % ny == 0);
+    //assert(local_grid_size_vec.z % nz == 0);
     reshape_final_kernel<<<numBlocks,blockSize>>>(buff1,buff2,ny,nz,local_grid_size_vec,nlocal);
     //cudaDeviceSynchronize();
     
