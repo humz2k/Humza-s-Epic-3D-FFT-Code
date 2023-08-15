@@ -111,16 +111,15 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
         //if(world_rank == 0)MPI_Abort(MPI_COMM_WORLD,1);
     }
 
-    //int n_per = ((ng[1] + (dims[2] * dims[0] - 1)) / (dims[2] * dims[0])) * ((local_grid_size[2] + (dims[1] - 1)) / dims[1]) * ((ng[2] + (dims[1] - 1))/dims[1]) * (dims[2] * dims[0]);
-    //if (n_per > buff_sz){
-    //    buff_sz = n_per;
-    //}
+    int n_per = ((ng[1] + (dims[2] * dims[0] - 1)) / (dims[2] * dims[0])) * ((local_grid_size[2] + (dims[1] - 1)) / dims[1]) * ((ng[2] + (dims[1] - 1))/dims[1]) * (dims[2] * dims[0]);
+    if (n_per > buff_sz){
+        buff_sz = n_per;
+    }
 
     //if(world_rank == 0)printf("\nnlocal = %d\nbuff_sz = %d\nmem_increase",nlocal,buff_sz);
     if (world_rank == 0){
         printf("Distribution:\n");
         printf("   ng              = [%d %d %d]\n",ng[0],ng[1],ng[2]);
-        printf("   padded_ng       = [%d %d %d]\n",padded_ng[0],padded_ng[1],padded_ng[2]);
         printf("   dims            = [%d %d %d]\n",dims[0],dims[1],dims[2]);
         printf("   local_grid_size = [%d %d %d]\n",local_grid_size[0],local_grid_size[1],local_grid_size[2]);
         printf("   nlocal          =  %d\n",nlocal);
@@ -186,20 +185,20 @@ template void Distribution::alltoall<complexFFT_t>(complexFFT_t*, complexFFT_t*,
 
 void Distribution::pencils_1(complexFFT_t* buff1, complexFFT_t* buff2){
 
-    //if(world_rank == 0)printf("pencils_1()\n");
+    if(world_rank == 0)printf("pencils_1()\n");
     /*if(world_rank == 0){
         printf("mini_pencil_size = %d\n",local_grid_size[2]);
         printf("old_send = %d\n",((nlocal + (dims[2] - 1)) / dims[2]));
         printf("new_send = %d\n",((local_grid_size[0] + (dims[2] - 1)) / dims[2]) * local_grid_size[1] * local_grid_size[2]);
     }*/
     int n_send = ((local_grid_size[0] + (dims[2] - 1)) / dims[2]) * local_grid_size[1] * local_grid_size[2];
-    //if(world_rank == 0)printf("n_send = %d\n",n_send);
+    if(world_rank == 0)printf("n_send = %d\n",n_send);
     //printf("%d %d %d\n",(nlocal + (dims[2] - 1)) / dims[2],((nlocal + (dims[2] - 1)) / dims[2]) % local_grid_size[2],local_grid_size[2]);
     //MPI_ASSERT((((nlocal + (dims[2] - 1)) / dims[2]) % local_grid_size[2]) == 0);
     //cudaDeviceSynchronize();
 
     //alltoall(buff1,buff2,((nlocal + (dims[2] - 1)) / dims[2]),distcomms[0]);
-    alltoall(buff1,buff2,nlocal / dims[2],distcomms[0]);
+    alltoall(buff1,buff2,n_send,distcomms[0]);
 
     reshape_1(buff2,buff1);
 }
@@ -218,7 +217,7 @@ void Distribution::pencils_2(complexFFT_t* buff1, complexFFT_t* buff2){
 
     int n_sends = ((ng[2] + (dims[1] - 1))/dims[1]) * local_grid_size[1] * ((local_grid_size[0] + (dims[2] - 1)) / dims[2]);
     //printf("AHHH:: %d %d\n",n_sends,((nlocal + (dims[1] - 1)) / dims[1]));
-    alltoall(buff2,buff1,nlocal / dims[1],distcomms[1]);
+    alltoall(buff2,buff1,n_sends,distcomms[1]);
 
     //printTest(buff1);
 
@@ -243,28 +242,27 @@ void Distribution::pencils_3(complexFFT_t* buff1, complexFFT_t* buff2){
     //int y_dim = (((nlocal + (z_dim - 1)) / z_dim) + (x_dim - 1)) / x_dim;
     //int y_dim = (((n + (z_dim - 1)) / z_dim) + (x_dim - 1)) / x_dim;
 
-    //int n_per = ((ng[1] + (dims[2] * dims[0] - 1)) / (dims[2] * dims[0])) * ((local_grid_size[2] + (dims[1] - 1)) / dims[1]) * ((ng[2] + (dims[1] - 1))/dims[1]);
-    //if(world_rank == 0)printf("n_per = %d, old = %d\n",n_per,((nlocal + ((dims[2] * dims[0]) - 1)) / (dims[2] * dims[0])));
+    int n_per = ((ng[1] + (dims[2] * dims[0] - 1)) / (dims[2] * dims[0])) * ((local_grid_size[2] + (dims[1] - 1)) / dims[1]) * ((ng[2] + (dims[1] - 1))/dims[1]);
+    if(world_rank == 0)printf("n_per = %d, old = %d\n",n_per,((nlocal + ((dims[2] * dims[0]) - 1)) / (dims[2] * dims[0])));
     //MPI_ASSERT((((((nlocal + ((dims[2] * dims[0]) - 1)) / (dims[2] * dims[0])) * (dims[2] * dims[0]) / ng[0]) * ng[0]) * (dims[2] * dims[0]) >= nlocal));
 
     //alltoall(buff2,buff1,((nlocal + ((dims[2] * dims[0]) - 1)) / (dims[2] * dims[0])),distcomms[2]);
-    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
-    //alltoall(buff2,buff1,n_per,distcomms[2]);
+    //alltoall(buff2,buff1,((nlocal + ((dims[2] * dims[0]) - 1)) / (dims[2] * dims[0])),distcomms[2]);
+    alltoall(buff2,buff1,n_per,distcomms[2]);
 
     //printTest(buff1);
 
     reshape_3(buff1,buff2);
 }
 
-//#define PUT
-
 void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     unreshape_3(buff1,buff2);
 
-    #ifdef PUT
+    printTest(buff2);
 
     MPI_Win win;
     MPI_Win_create(h_buff1,sizeof(complexFFT_t)*buff_sz,sizeof(complexFFT_t),MPI_INFO_NULL,world_comm,&win);
+
 
     int dest_x_start = 0;
     int dest_x_end = dims[0] - 1;
@@ -278,7 +276,7 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
 
     int y_size = ((padded_ng[1] + (dims[0] * dims[2] - 1)) / (dims[0] * dims[2]));
     int z_size = ((padded_ng[2] + (dims[1] - 1)) / dims[1]);
-
+    //int x_size = ((padded_ng[0] + (dims[0] - 1))/dims[0]) * dims[0];
     int x_size = padded_ng[0];
 
     int size = x_size*y_size*z_size;
@@ -296,14 +294,12 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     cudaMemcpy(h_buff2,buff2,sizeof(complexFFT_t)*buff_sz,cudaMemcpyDeviceToHost);
     #endif
     #endif
-    cudaDeviceSynchronize();
-    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Win_fence(0, win);
-
+    //MPI_Request reqs[n_recvs];
     int count = 0;
     for (int x = dest_x_start; x < dest_x_end+1; x++){
         int dest = x*dims[1]*dims[2] + y*dims[2] + z;
-
+        //MPI_Request req;
 
         int reqidx = x - dest_x_start;
         int nx = (dest_x_end+1) - dest_x_start;
@@ -312,11 +308,8 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
         int xsrc = x * local_grid_size[0];
         int ysrc = ((coords[0] * dims[2] + coords[2]) * ((padded_ng[1] + (dims[0] * dims[2] - 1)) / (dims[0] * dims[2])));
         int zsrc = (coords[1] * ((padded_ng[2] + (dims[1] - 1)) / dims[1]));
-
+        //int id = xsrc * local_grid_size[1] * local_grid_size[2] + ysrc * local_grid_size[2] + zsrc;
         int id = xsrc * padded_ng[1] * padded_ng[2] + ysrc * padded_ng[2] + zsrc;
-
-        int y_send_id = (ysrc % local_grid_size[1]) / (local_grid_size[1] / y_send);
-
 
         int tmp1 = count / y_send;
 
@@ -327,19 +320,23 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
         int xrec = local_grid_size[0] * coords[0] + xoff;
         int yrec = local_grid_size[1] * coords[1] + yoff;
         int zrec = local_grid_size[2] * coords[2] + zoff;
-
+        //int recid = xrec * local_grid_size[1] * local_grid_size[2] + yrec * local_grid_size[2] + zrec;
         int recid = yrec * local_grid_size[2] + zrec;
         if (y < dims[1]){
-            
+            printf("rank %d putting %d in %d (%d, %d, %d) (size = %d), destination = %d\n",world_rank,id,dest,xsrc,ysrc,zsrc,size / n_recvs,(size / n_recvs) * y_send_id);
             MPI_Put(&src_buff[count*(size/n_recvs)],(size/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,(size/n_recvs)*y_send_id,(size/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,win);
+            //MPI_Isend(&src_buff[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,id,world_comm,&req);
+            //MPI_Request_free(&req);
         }
-        
+        //printf("rank %d recieving %d, (yrec = %d, zrec = %d)\n",world_rank,recid,yrec,zrec);
+        //MPI_Irecv(&dest_buff[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,recid,world_comm,&reqs[count]);
         count++;
-    }
+    }//mismatch between nsends and nrecvs because not all the ranks have to send data
 
+    //for (int i = 0; i < n_recvs; i++){
+    //    MPI_Wait(&reqs[i],MPI_STATUS_IGNORE);
+    //}
     MPI_Win_fence(0, win);
-
-    
 
     #ifdef GPU
     #ifndef cudampi
@@ -347,13 +344,14 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     #endif
     #endif
 
+    printTest(buff1);
+
     reshape_final(buff1,buff2,y_send,n_recvs / y_send);
 
     MPI_Win_free(&win);
     return;
-    #else
     //if(world_rank == 0)printf("return_pencils()\n");
-    
+    /*
     int dest_x_start = 0;
     int dest_x_end = dims[0] - 1;
 
@@ -422,11 +420,11 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
         //int recid = xrec * local_grid_size[1] * local_grid_size[2] + yrec * local_grid_size[2] + zrec;
         int recid = yrec * local_grid_size[2] + zrec;
         if (y < dims[1]){
-            //printf("rank %d sending %d to %d (ysrc = %d, zsrc = %d)\n",world_rank,id,dest,ysrc,zsrc);
+            printf("rank %d sending %d to %d (ysrc = %d, zsrc = %d)\n",world_rank,id,dest,ysrc,zsrc);
             MPI_Isend(&src_buff[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,dest,id,world_comm,&req);
             MPI_Request_free(&req);
         }
-        //printf("rank %d recieving %d, (yrec = %d, zrec = %d)\n",world_rank,recid,yrec,zrec);
+        printf("rank %d recieving %d, (yrec = %d, zrec = %d)\n",world_rank,recid,yrec,zrec);
         MPI_Irecv(&dest_buff[count*(nlocal/n_recvs)],(nlocal/n_recvs) * sizeof(complexFFT_t),MPI_BYTE,MPI_ANY_SOURCE,recid,world_comm,&reqs[count]);
         count++;
     }//mismatch between nsends and nrecvs because not all the ranks have to send data
@@ -441,8 +439,7 @@ void Distribution::return_pencils(complexFFT_t* buff1, complexFFT_t* buff2){
     #endif
     #endif
 
-    reshape_final(buff1,buff2,y_send,n_recvs / y_send);
-    #endif
+    reshape_final(buff1,buff2,y_send,n_recvs / y_send);*/
 }
 
 void Distribution::reshape_1(complexFFT_t* buff1, complexFFT_t* buff2){
@@ -561,7 +558,7 @@ void Distribution::unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2){
 void Distribution::reshape_3(complexFFT_t* buff1, complexFFT_t* buff2){
     int n_recvs = dims[0] * dims[2];
     int mini_pencil_size = (((ng[0] + (dims[0]-1))/dims[0])*dims[0] + (n_recvs - 1)) / n_recvs;
-    //printf("mini_pencil_size = %d\n",mini_pencil_size);
+    printf("mini_pencil_size = %d\n",mini_pencil_size);
     int send_per_rank = ((ng[1] + (dims[2] * dims[0] - 1)) / (dims[2] * dims[0])) * ((local_grid_size[2] + (dims[1] - 1)) / dims[1]) * ((ng[2] + (dims[1] - 1))/dims[1]);
     //int send_per_rank = (nlocal + (n_recvs - 1)) / n_recvs;
     int pencils_per_rank = send_per_rank / mini_pencil_size;
@@ -569,7 +566,7 @@ void Distribution::reshape_3(complexFFT_t* buff1, complexFFT_t* buff2){
     //MPI_ASSERT(send_per_rank % mini_pencil_size == 0);
     int stride = ((local_grid_size[0] + (dims[2] - 1)) / dims[2]) * dims[2];
     int offset = stride - local_grid_size[0];
-    //printf("stride = %d, offset = %d\n",stride,offset);
+    printf("stride = %d, offset = %d\n",stride,offset);
     #ifdef GPU
     launch_reshape_stride(buff1,buff2,n_recvs,mini_pencil_size,send_per_rank,pencils_per_rank,stride,offset,send_per_rank * n_recvs,blockSize);
     #else
