@@ -19,13 +19,15 @@ DFFT_CUDA_LD ?= -lcufft -lcudart
 
 DFFT_CUDA_FLAGS ?= -lineinfo -Xptxas -v -Xcompiler="-fPIC" $(DFFT_CUDA_ARCH)
 
+DFFT_CUDA_MPI ?=
+
 # MPI C compiler
-DFFT_MPI_CC ?= mpicc -O3
+DFFT_MPI_CC ?= mpicc -O3 $(DFFT_CUDA_MPI)
 
 # MPI C++ compiler
-DFFT_MPI_CXX ?= mpicxx -O3
+DFFT_MPI_CXX ?= mpicxx -O3 $(DFFT_CUDA_MPI)
 
-DFFT_CUDA_CC ?= nvcc -O3
+DFFT_CUDA_CC ?= nvcc -O3 $(DFFT_CUDA_MPI)
 
 main: gpu
 

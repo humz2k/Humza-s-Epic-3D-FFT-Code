@@ -30,6 +30,11 @@ Distribution::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSi
         printf("   nlocal          = %d\n",nlocal);
         printf("   blockSize       = %d\n",blockSize);
         printf("   world_size      = %d\n",world_size);
+        #ifdef cudampi
+        printf("   using cuda mpi\n");
+        #else
+        printf("   not using cuda mpi (!!)\n");
+        #endif
         
     }
 
