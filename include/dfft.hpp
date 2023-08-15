@@ -41,7 +41,6 @@ class Distribution{
     public:
         int ng[3];
         int nlocal;
-        int buff_sz;
         int world_size;
         int world_rank;
         int local_grid_size[3];

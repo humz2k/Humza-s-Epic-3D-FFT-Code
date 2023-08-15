@@ -138,7 +138,7 @@ void cpy(T* buff1, T* buff2, int n){
 void test(int ngx, int ngy, int ngz, int blockSize, int reps){
     Distribution dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
     Dfft dfft(dist);
-    //return;
+
     complexFFT_t* buff1; cudaMalloc(&buff1,sizeof(complexFFT_t)*dist.buffSize());
     complexFFT_t* buff2; cudaMalloc(&buff2,sizeof(complexFFT_t)*dist.buffSize());
 
