@@ -1,0 +1,13 @@
+
+testdfft:828706 terminated with signal 11 at PC=7f2e03f13d74 SP=7ffe863794f8.  Backtrace:
+/lib/x86_64-linux-gnu/libcuda.so.1(+0x32cd74)[0x7f2e03f13d74]
+/lib/x86_64-linux-gnu/libcuda.so.1(+0x336c6f)[0x7f2e03f1dc6f]
+/lib/x86_64-linux-gnu/libcuda.so.1(+0x3ae42a)[0x7f2e03f9542a]
+/lib/x86_64-linux-gnu/libcuda.so.1(+0x3ae19d)[0x7f2e03f9519d]
+/lib/x86_64-linux-gnu/libcuda.so.1(+0x2b0663)[0x7f2e03e97663]
+/usr/local/cuda-11.8/lib64/libcudart.so.11.0(+0x15d30)[0x7f2e08215d30]
+/usr/local/cuda-11.8/lib64/libcudart.so.11.0(cudaFree+0x190)[0x7f2e08251570]
+build/testdfft(+0x33a4)[0x56066b6393a4]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90)[0x7f2e057e9d90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80)[0x7f2e057e9e40]
+build/testdfft(+0x36a5)[0x56066b6396a5]
