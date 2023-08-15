@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "*.include": "makefile",
-        "type_traits": "cpp"
-    }
-}
