@@ -1,4 +1,4 @@
-export MY_PLATFORM="summit"
+export DFFT_PLATFORM="summit"
 
 module load gcc
 module load cuda

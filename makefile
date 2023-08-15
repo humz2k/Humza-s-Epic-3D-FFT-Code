@@ -4,6 +4,8 @@ DFFT_CPU_LIB_DIR ?= $(DFFT_LIB_DIR)/cpu
 DFFT_GPU_LIB_DIR ?= $(DFFT_LIB_DIR)/gpu
 DFFT_CUDA_LIB_DIR ?= $(DFFT_GPU_LIB_DIR)/cuda
 
+DFFT_PLATFORM ?= unknown
+
 DFFT_GPU_AR ?= lib/fbfftgpu.a
 
 DFFT_CUDA_LIB ?= /usr/local/cuda/lib64
@@ -57,4 +59,4 @@ $(DFFT_GPU_AR): $(DFFT_GPU_LIB_DIR)/distribution.o $(DFFT_CUDA_LIB_DIR)/reshape.
 	ar cr $@ $^
 
 $(DFFT_BUILD_DIR)/testdfft: test/testdfft.cpp $(DFFT_GPU_AR) | $(DFFT_BUILD_DIR)
-	$(DFFT_MPI_CXX) $(DFFT_CUDA_MPI) $(DFFT_INCLUDE) $^ $(DFFT_LD) $(DFFT_CUDA_LD) -o $@
+	$(DFFT_MPI_CXX) $(DFFT_CUDA_MPI) -D$(DFFT_PLATFORM) $(DFFT_INCLUDE) $^ $(DFFT_LD) $(DFFT_CUDA_LD) -o $@

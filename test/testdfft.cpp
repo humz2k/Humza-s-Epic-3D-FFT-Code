@@ -2,7 +2,6 @@
 #include <iostream>
 #include <iomanip>
 #include <complex>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -183,6 +182,10 @@ int main(int argc, char** argv){
         printf("USAGE: %s <reps> <blockSize> <ng>\n",argv[0]);
         return 0;
     }
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
+
+    if(world_rank == 0)printf("Testing on platform: %s\n",TOSTRING(DFFT_PLATFORM));
 
     test<complexDouble>(ng,ng,ng,blockSize,reps);
     //test<complexFloat>(ng,ng,ng,blockSize,reps);

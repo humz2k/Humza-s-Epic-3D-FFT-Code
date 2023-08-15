@@ -4,6 +4,9 @@
 
 #define DFFT_TIMING 1
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 #define GPU
 //#define cudampi
 
