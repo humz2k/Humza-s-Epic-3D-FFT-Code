@@ -437,7 +437,7 @@ void Distribution::printTest(complexFFT_t* buff){
     free(printBuff);
     #endif
 }
-
+#ifndef cudampi
 void Distribution::runTest(complexFFT_t* buff1, complexFFT_t* buff2){
 
     fillTest(buff1);
@@ -461,3 +461,4 @@ void Distribution::runTest(complexFFT_t* buff1, complexFFT_t* buff2){
     printTest(buff2);
 
 }
+#endif
