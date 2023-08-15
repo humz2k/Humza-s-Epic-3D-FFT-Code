@@ -14,11 +14,11 @@ uint64_t double_to_uint64_t(double d) {
   return i;
 }
 
+template<class T>
+void check_kspace(Distribution<T> &dist, T *a_){
 
-void check_kspace(Distribution &dist, complexFFT_t *a_){
-
-    complexFFT_t* a = (complexFFT_t*)malloc(sizeof(complexFFT_t) * dist.nlocal);
-    cudaMemcpy(a,a_,sizeof(complexFFT_t)*dist.nlocal,cudaMemcpyDeviceToHost);
+    T* a = (T*)malloc(sizeof(T) * dist.nlocal);
+    cudaMemcpy(a,a_,sizeof(T)*dist.nlocal,cudaMemcpyDeviceToHost);
 
     double LocalRealMin, LocalRealMax, LocalImagMin, LocalImagMax;
     LocalRealMin = LocalRealMax = a[1].x;
@@ -62,10 +62,11 @@ void check_kspace(Distribution &dist, complexFFT_t *a_){
 
 }
 
-void check_rspace(Distribution &dist, complexFFT_t *a_){
+template<class T>
+void check_rspace(Distribution<T> &dist, T *a_){
 
-    complexFFT_t* a = (complexFFT_t*)malloc(sizeof(complexFFT_t) * dist.nlocal);
-    cudaMemcpy(a,a_,sizeof(complexFFT_t)*dist.nlocal,cudaMemcpyDeviceToHost);
+    T* a = (T*)malloc(sizeof(T) * dist.nlocal);
+    cudaMemcpy(a,a_,sizeof(T)*dist.nlocal,cudaMemcpyDeviceToHost);
 
     const int *self = dist.coords;
 
@@ -135,12 +136,13 @@ void cpy(T* buff1, T* buff2, int n){
     }
 }
 
+template<class T>
 void test(int ngx, int ngy, int ngz, int blockSize, int reps){
-    Distribution dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
-    Dfft dfft(dist);
+    Distribution<T> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
+    Dfft<T> dfft(dist);
 
-    complexFFT_t* buff1; cudaMalloc(&buff1,sizeof(complexFFT_t)*dist.buffSize());
-    complexFFT_t* buff2; cudaMalloc(&buff2,sizeof(complexFFT_t)*dist.buffSize());
+    T* buff1; cudaMalloc(&buff1,sizeof(T)*dist.buffSize());
+    T* buff2; cudaMalloc(&buff2,sizeof(T)*dist.buffSize());
 
     dfft.makePlans(buff1,buff2);
 
@@ -182,7 +184,8 @@ int main(int argc, char** argv){
         return 0;
     }
 
-    test(ng,ng,ng,blockSize,reps);
+    test<complexDouble>(ng,ng,ng,blockSize,reps);
+    //test<complexFloat>(ng,ng,ng,blockSize,reps);
 
     MPI_Finalize();
     return 0;

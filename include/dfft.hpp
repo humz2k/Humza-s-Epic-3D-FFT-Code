@@ -2,6 +2,8 @@
 #include "complex-type.hpp"
 #include <stdio.h>
 
+#define DFFT_TIMING 1
+
 #define GPU
 //#define cudampi
 
@@ -36,7 +38,7 @@ inline void printTimingStats(MPI_Comm comm,        // comm for MPI_Allreduce()
   return;
 }
 
-
+template <class T>
 class Distribution{
     public:
         int ng[3];
@@ -50,10 +52,19 @@ class Distribution{
         MPI_Comm world_comm;
         MPI_Comm distcomms[4];
 
+        double pencil_1_comm_time;
+        double pencil_1_calc_time;
+        double pencil_2_comm_time;
+        double pencil_2_calc_time;
+        double pencil_3_comm_time;
+        double pencil_3_calc_time;
+        double return_comm_time;
+        double return_calc_time;
+
         #ifdef GPU
             #ifndef cudampi
-            complexFFT_t* h_buff1;
-            complexFFT_t* h_buff2;
+            T* h_buff1;
+            T* h_buff2;
             #endif
         #endif
 
@@ -65,52 +76,53 @@ class Distribution{
         Distribution(MPI_Comm comm_, int ngx, int ngy, int ngz, int blockSize_);
         ~Distribution();
 
-        void pencils_1(complexFFT_t* buff1, complexFFT_t* buff2);
-        void pencils_2(complexFFT_t* buff1, complexFFT_t* buff2);
-        void pencils_3(complexFFT_t* buff1, complexFFT_t* buff2);
-        void return_pencils(complexFFT_t* buff1, complexFFT_t* buff2);
+        void pencils_1(T* buff1, T* buff2);
+        void pencils_2(T* buff1, T* buff2);
+        void pencils_3(T* buff1, T* buff2);
+        void return_pencils(T* buff1, T* buff2);
 
         int tests;
-        void fillTest(complexFFT_t* buff);
-        void printTest(complexFFT_t* buff);
+        void fillTest(T* buff);
+        void printTest(T* buff);
 
-        void reshape_1(complexFFT_t* buff1, complexFFT_t* buff2);
-        void unreshape_1(complexFFT_t* buff1, complexFFT_t* buff2);
+        void reshape_1(T* buff1, T* buff2);
+        void unreshape_1(T* buff1, T* buff2);
 
-        void reshape_2(complexFFT_t* buff1, complexFFT_t* buff2);
-        void unreshape_2(complexFFT_t* buff1, complexFFT_t* buff2);
+        void reshape_2(T* buff1, T* buff2);
+        void unreshape_2(T* buff1, T* buff2);
 
-        void reshape_3(complexFFT_t* buff1, complexFFT_t* buff2);
-        void unreshape_3(complexFFT_t* buff1, complexFFT_t* buff2);
+        void reshape_3(T* buff1, T* buff2);
+        void unreshape_3(T* buff1, T* buff2);
 
-        void reshape_final(complexFFT_t* buff1, complexFFT_t* buff2, int ny, int nz);
+        void reshape_final(T* buff1, T* buff2, int ny, int nz);
 
-        void runTest(complexFFT_t* buff1, complexFFT_t* buff2);
+        void runTest(T* buff1, T* buff2);
 
-        template<class T>
         void alltoall(T* src, T* dest, int n_recv, MPI_Comm comm);
 
         int buffSize();
 };
 
+template <class T>
 class Dfft{
     public:
-        Distribution& dist;
+        Distribution<T>& dist;
         int ng;
         int nlocal;
-        complexFFT_t* buff1;
-        complexFFT_t* buff2;
+        T* buff1;
+        T* buff2;
         #ifdef GPU
         cufftHandle plan;
         #endif
         bool plansMade;
 
-        Dfft(Distribution& dist_);
+        Dfft(Distribution<T>& dist_);
         ~Dfft();
 
-        void makePlans(complexFFT_t* buff1_, complexFFT_t* buff2_);
+        void makePlans(T* buff1_, T* buff2_);
         void forward();
         void backward();
+        void exec1d(T* buff1_, T* buff2_, int direction);
         void fft(int direction);
         void fillDelta();
 };
