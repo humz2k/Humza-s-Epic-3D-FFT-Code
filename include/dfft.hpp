@@ -2,11 +2,6 @@
 #include "complex-type.hpp"
 #include <stdio.h>
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
-#define MPI_ASSERT(cond) if (!cond){if (world_rank == 0){printf("%s failed\n",TOSTRING(cond)); MPI_Abort(MPI_COMM_WORLD,1);}}
-
 #define GPU
 //#define cudampi
 
