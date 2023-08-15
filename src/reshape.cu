@@ -26,6 +26,37 @@ void launch_reshape(complexFFT_t* buff1, complexFFT_t* buff2, int n_recvs, int m
     //cudaDeviceSynchronize();
 }
 
+__global__ void reshape_stride_kernel(const complexFFT_t* __restrict buff1, complexFFT_t* __restrict buff2, int n_recvs, int mini_pencil_size, int send_per_rank, int pencils_per_rank, int nlocal, int stride, int offset){
+    int i = threadIdx.x+blockDim.x*blockIdx.x;
+    if (i >= nlocal)return;
+
+    int mini_pencil_id = i / mini_pencil_size;
+
+    int rank = i / send_per_rank;
+
+    int rank_offset = rank * mini_pencil_size;
+
+    int pencil_offset = (mini_pencil_id % pencils_per_rank) * mini_pencil_size * n_recvs;
+
+    int local_offset = i % mini_pencil_size;
+
+    int new_idx = rank_offset + pencil_offset + local_offset;
+
+    int stride_count = new_idx / stride;
+    int offset_count = stride_count * offset;
+    int local_stride = new_idx % stride;
+
+    if (local_stride < (stride - offset)){
+        buff2[new_idx - offset_count] = __ldg(&buff1[i]);
+    }
+}
+
+void launch_reshape_stride(complexFFT_t* buff1, complexFFT_t* buff2, int n_recvs, int mini_pencil_size, int send_per_rank, int pencils_per_rank, int stride, int offset, int nlocal, int blockSize){
+    int numBlocks = (nlocal + (blockSize - 1))/blockSize;
+    reshape_stride_kernel<<<numBlocks,blockSize>>>(buff1,buff2,n_recvs,mini_pencil_size,send_per_rank,pencils_per_rank,nlocal,stride,offset);
+    //cudaDeviceSynchronize();
+}
+
 __global__ void unreshape_kernel(const complexFFT_t* __restrict buff1, complexFFT_t* __restrict buff2, int z_dim, int x_dim, int y_dim, int nlocal){
     int i = threadIdx.x+blockDim.x*blockIdx.x;
     if (i >= nlocal)return;

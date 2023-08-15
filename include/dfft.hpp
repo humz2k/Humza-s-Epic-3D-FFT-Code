@@ -45,6 +45,7 @@ inline void printTimingStats(MPI_Comm comm,        // comm for MPI_Allreduce()
 class Distribution{
     public:
         int ng[3];
+        int padded_ng[3];
         int nlocal;
         int buff_sz;
         int world_size;
