@@ -387,7 +387,7 @@ void Distribution::reshape_final(complexFFT_t* buff1, complexFFT_t* buff2, int n
     }
     #endif
 }
-
+#ifndef cudampi
 void Distribution::fillTest(complexFFT_t* buff){
     int i = 0;
     for (int x = local_coords_start[0]; x < local_grid_size[0] + local_coords_start[0]; x++){
@@ -409,6 +409,7 @@ void Distribution::fillTest(complexFFT_t* buff){
     cudaMemcpy(buff,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
     #endif
 }
+#endif
 
 void Distribution::printTest(complexFFT_t* buff){
     MPI_Barrier(world_comm);
