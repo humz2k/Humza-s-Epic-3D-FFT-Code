@@ -1,0 +1,11 @@
+export DFFT_PLATFORM="roomba"
+
+export DFFT_CUDA_ARCH="-gencode=arch=compute_70,code=sm_70"
+
+export DFFT_MPI_CC="mpicc -O3"
+
+export DFFT_MPI_CXX="mpicxx -O3"
+
+export DFFT_CUDA_CC="nvcc -O3"
+
+conda deactivate
