@@ -137,8 +137,8 @@ void cpy(T* buff1, T* buff2, int n){
 
 template<class T>
 void test(int ngx, int ngy, int ngz, int blockSize, int reps){
-    DistributionSends<T> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
-    Dfft<T,DistributionSends<T>> dfft(dist);
+    Distribution<T> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
+    Dfft<T,Distribution<T>> dfft(dist);
 
     T* buff1; cudaMalloc(&buff1,sizeof(T)*dist.buffSize());
     T* buff2; cudaMalloc(&buff2,sizeof(T)*dist.buffSize());
