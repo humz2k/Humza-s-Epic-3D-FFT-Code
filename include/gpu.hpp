@@ -85,7 +85,7 @@
 
 #define gpuFree hipFree
 
-#define gpuLaunch(kernel,numBlocks,blockSize,...) hipLaunchKernel(kernel,dim3(numBlocks),dim3(blockSize),0,0,__VA_ARGS__)
+#define gpuLaunch(kernel,numBlocks,blockSize,...) hipLaunchKernelGGL(kernel,dim3(numBlocks),dim3(blockSize),0,0,__VA_ARGS__)
 
 #endif
 
