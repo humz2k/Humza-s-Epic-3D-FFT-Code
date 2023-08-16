@@ -1,19 +1,19 @@
 #include "dfft.hpp"
 
-template<class T>
-Dfft<T>::Dfft(Distribution<T>& dist_) : dist(dist_){
+template<class T, class Dist>
+Dfft<T, Dist>::Dfft(Dist& dist_) : dist(dist_){
     ng = dist.ng[0];
     nlocal = dist.nlocal;
     plansMade = false;
 }
 
-template<class T>
-Dfft<T>::~Dfft(){
+template<class T, class Dist>
+Dfft<T, Dist>::~Dfft(){
     if (plansMade)cufftDestroy(plan);
 }
 
 template<>
-void Dfft<complexDouble>::makePlans(complexDouble* buff1_, complexDouble* buff2_){
+void Dfft<complexDouble,Distribution<complexDouble>>::makePlans(complexDouble* buff1_, complexDouble* buff2_){
     buff1 = buff1_;
     buff2 = buff2_;
 
@@ -30,7 +30,7 @@ void Dfft<complexDouble>::makePlans(complexDouble* buff1_, complexDouble* buff2_
 }
 
 template<>
-void Dfft<complexFloat>::makePlans(complexFloat* buff1_, complexFloat* buff2_){
+void Dfft<complexFloat,Distribution<complexFloat>>::makePlans(complexFloat* buff1_, complexFloat* buff2_){
     buff1 = buff1_;
     buff2 = buff2_;
 
@@ -46,8 +46,42 @@ void Dfft<complexFloat>::makePlans(complexFloat* buff1_, complexFloat* buff2_){
 
 }
 
-template<class T>
-void Dfft<T>::forward(){
+template<>
+void Dfft<complexDouble,DistributionSends<complexDouble>>::makePlans(complexDouble* buff1_, complexDouble* buff2_){
+    buff1 = buff1_;
+    buff2 = buff2_;
+
+    #ifdef GPU
+    int nFFTs = nlocal / ng;
+    if (cufftPlan1d(&plan, ng, CUFFT_Z2Z, nFFTs) != CUFFT_SUCCESS){
+        printf("CUFFT error: Plan creation failed\n");
+        return;	
+    }
+    #endif
+
+    plansMade = true;
+
+}
+
+template<>
+void Dfft<complexFloat,DistributionSends<complexFloat>>::makePlans(complexFloat* buff1_, complexFloat* buff2_){
+    buff1 = buff1_;
+    buff2 = buff2_;
+
+    #ifdef GPU
+    int nFFTs = nlocal / ng;
+    if (cufftPlan1d(&plan, ng, CUFFT_C2C, nFFTs) != CUFFT_SUCCESS){
+        printf("CUFFT error: Plan creation failed\n");
+        return;	
+    }
+    #endif
+
+    plansMade = true;
+
+}
+
+template<class T, class Dist>
+void Dfft<T,Dist>::forward(){
     #ifdef DFFT_TIMING
     double start = MPI_Wtime();
     #endif
@@ -65,8 +99,8 @@ void Dfft<T>::forward(){
     #endif
 }
 
-template<class T>
-void Dfft<T>::backward(){
+template<class T, class Dist>
+void Dfft<T,Dist>::backward(){
     #ifdef DFFT_TIMING
     double start = MPI_Wtime();
     #endif
@@ -85,7 +119,7 @@ void Dfft<T>::backward(){
 }
 
 template<>
-void Dfft<complexDouble>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
+void Dfft<complexDouble,Distribution<complexDouble>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
     #ifdef GPU
     if (cufftExecZ2Z(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
@@ -95,7 +129,7 @@ void Dfft<complexDouble>::exec1d(complexDouble* buff1_, complexDouble* buff2_, i
     #endif
 }
 template<>
-void Dfft<complexFloat>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
+void Dfft<complexFloat,Distribution<complexFloat>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
     #ifdef GPU
     if (cufftExecC2C(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
@@ -105,53 +139,46 @@ void Dfft<complexFloat>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int 
     #endif
 }
 
-template<class T>
-void Dfft<T>::fft(int direction){
-    dist.pencils_1(buff1,buff2);
-
-    //dist.printTest(buff1);
-    /*#ifdef GPU
-    if (cufftExecZ2Z(plan, buff1, buff2, direction) != CUFFT_SUCCESS){
+template<>
+void Dfft<complexDouble,DistributionSends<complexDouble>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
+    #ifdef GPU
+    if (cufftExecZ2Z(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
     //cudaDeviceSynchronize();
-    #endif*/
+    #endif
+}
+template<>
+void Dfft<complexFloat,DistributionSends<complexFloat>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
+    #ifdef GPU
+    if (cufftExecC2C(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
+        printf("CUFFT error: ExecZ2Z Forward failed\n");
+        return;	
+    }
+    //cudaDeviceSynchronize();
+    #endif
+}
+
+template<class T, class Dist>
+void Dfft<T,Dist>::fft(int direction){
+    dist.pencils_1(buff1,buff2);
 
     exec1d(buff1,buff2,direction);
 
     dist.pencils_2(buff2,buff1);
 
-    //dist.printTest(buff2);
-    /*#ifdef GPU
-    if (cufftExecZ2Z(plan, buff1, buff2, direction) != CUFFT_SUCCESS){
-        printf("CUFFT error: ExecZ2Z Forward failed\n");
-        return;	
-    }
-    //cudaDeviceSynchronize();
-    #endif*/
-
     exec1d(buff1,buff2,direction);
 
     dist.pencils_3(buff2,buff1);
 
-    //dist.printTest(buff1);
-    /*#ifdef GPU
-    if (cufftExecZ2Z(plan, buff1, buff2, direction) != CUFFT_SUCCESS){
-        printf("CUFFT error: ExecZ2Z Forward failed\n");
-        return;	
-    }
-    //cudaDeviceSynchronize();
-    #endif*/
-
     exec1d(buff1,buff2,direction);
 
     dist.return_pencils(buff2,buff1);
-    //dist.printTest(buff1);
 }
 
-template<class T>
-void Dfft<T>::fillDelta(){
+template<class T, class Dist>
+void Dfft<T,Dist>::fillDelta(){
     //complexFFT_t* fillArray = buff1;
     #ifdef GPU
     cudaMemset(buff1,0,sizeof(T)*dist.nlocal);
@@ -164,5 +191,8 @@ void Dfft<T>::fillDelta(){
     #endif
 }
 
-template class Dfft<complexFloat>;
-template class Dfft<complexDouble>;
+template class Dfft<complexFloat,Distribution<complexFloat>>;
+template class Dfft<complexDouble,Distribution<complexDouble>>;
+
+template class Dfft<complexFloat,DistributionSends<complexFloat>>;
+template class Dfft<complexDouble,DistributionSends<complexDouble>>;

@@ -3,7 +3,7 @@
 #include <cassert>
 
 template<class T>
-Distribution<T>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSize_) : world_comm(comm), ng {ngx,ngy,ngz} , blockSize(blockSize_), dims {0,0,0}, tests(0) {
+DistributionSends<T>::DistributionSends(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSize_) : world_comm(comm), ng {ngx,ngy,ngz} , blockSize(blockSize_), dims {0,0,0}, tests(0) {
     MPI_Comm_rank(world_comm,&world_rank);
     MPI_Comm_size(world_comm,&world_size);
 
@@ -83,12 +83,12 @@ Distribution<T>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int bloc
 }
 
 template<class T>
-int Distribution<T>::buffSize(){
+int DistributionSends<T>::buffSize(){
     return nlocal;
 }
 
 template<class T>
-Distribution<T>::~Distribution(){
+DistributionSends<T>::~DistributionSends(){
     #ifdef GPU
     #ifndef cudampi
     free(h_buff1);
@@ -98,20 +98,67 @@ Distribution<T>::~Distribution(){
 }
 
 template<class T>
-void Distribution<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
+void DistributionSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
+    int comm_rank; MPI_Comm_rank(comm,&comm_rank);
+    int comm_size; MPI_Comm_size(comm,&comm_size);
     #if defined(GPU) && !defined(cudampi)
+    T* src_buff = h_buff1;
+    T* dest_buff = h_buff2;
     cudaMemcpy(h_buff1,src,nlocal * sizeof(T),cudaMemcpyDeviceToHost);
-    MPI_Alltoall(h_buff1,n * sizeof(T),MPI_BYTE,h_buff2,n * sizeof(T),MPI_BYTE,comm);
-    cudaMemcpy(dest,h_buff2,nlocal * sizeof(T),cudaMemcpyHostToDevice);
     #else
-    MPI_Alltoall(src,n * sizeof(T),MPI_BYTE,dest,n * sizeof(T),MPI_BYTE,comm);
+    T* src_buff = src;
+    T* dest_buff = dest;
     #endif
+
+    if (comm_size == 2){
+        //printf("SEND_RECV!\n");
+        MPI_Sendrecv(&src_buff[((comm_rank + 1)%comm_size) * n],n*sizeof(T),MPI_BYTE,(comm_rank + 1)%comm_size,0,&dest_buff[((comm_rank+1)%comm_size) * n],n*sizeof(T),MPI_BYTE,(comm_rank + 1)%comm_size,0,comm,MPI_STATUS_IGNORE);
+
+        #if defined(GPU) && !defined(cudampi)
+        for (int j = 0; j < n; j++){
+            dest_buff[comm_rank * n + j] = src_buff[comm_rank * n + j];
+        }
+        #else
+        cudaMemcpy(&dest[comm_rank * n],&src[comm_rank * n],n * sizeof(T),cudaMemcpyDeviceToDevice);
+        #endif
+        
+    } else {
+        
+        MPI_Request reqs[comm_size];
+        for (int i = 0; i < comm_size; i++){
+            if (i == comm_rank){
+                #if defined(GPU) && !defined(cudampi)
+                for (int j = 0; j < n; j++){
+                    dest_buff[comm_rank * n + j] = src_buff[comm_rank * n + j];
+                }
+                #else
+                cudaMemcpy(&dest[comm_rank * n],&src[comm_rank * n],n * sizeof(T),cudaMemcpyDeviceToDevice);
+                #endif
+                continue;
+            } else {
+                MPI_Request req;
+                MPI_Isend(&src_buff[i * n],n * sizeof(T),MPI_BYTE,i,0,comm,&req);
+                MPI_Request_free(&req);
+                MPI_Irecv(&dest_buff[i * n],n * sizeof(T),MPI_BYTE,i,0,comm,&reqs[i]);
+            }
+        }
+
+        for (int i = 0; i < comm_size; i++){
+            if (i == comm_rank)continue;
+            MPI_Wait(&reqs[i],MPI_STATUS_IGNORE);
+        }
+    }
+
+    #if defined(GPU) && !defined(cudampi)
+    cudaMemcpy(dest,h_buff2,nlocal * sizeof(T),cudaMemcpyHostToDevice);
+    #endif
+    
 }
 
 //template void Distribution::alltoall<complexFFT_t>(complexFFT_t*, complexFFT_t*, int, MPI_Comm);
 
 template<class T>
-void Distribution<T>::pencils_1(T* buff1, T* buff2){
+void DistributionSends<T>::pencils_1(T* buff1, T* buff2){
 
     //cudaDeviceSynchronize();
     #if DFFT_TIMING == 1
@@ -129,7 +176,7 @@ void Distribution<T>::pencils_1(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::pencils_2(T* buff1, T* buff2){
+void DistributionSends<T>::pencils_2(T* buff1, T* buff2){
     unreshape_1(buff1,buff2);
 
     cudaDeviceSynchronize();
@@ -149,7 +196,7 @@ void Distribution<T>::pencils_2(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::pencils_3(T* buff1, T* buff2){
+void DistributionSends<T>::pencils_3(T* buff1, T* buff2){
     unreshape_2(buff1,buff2);
 
     cudaDeviceSynchronize();
@@ -169,7 +216,7 @@ void Distribution<T>::pencils_3(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::return_pencils_sm(T* buff1, T* buff2){
+void DistributionSends<T>::return_pencils_sm(T* buff1, T* buff2){
     unreshape_3(buff1,buff2);
 
     int dest_x_start = 0;
@@ -259,7 +306,7 @@ void Distribution<T>::return_pencils_sm(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::return_pencils(T* buff1, T* buff2){
+void DistributionSends<T>::return_pencils(T* buff1, T* buff2){
     unreshape_3(buff1,buff2);
 
     int dest_x_start = 0;
@@ -341,7 +388,7 @@ void Distribution<T>::return_pencils(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::reshape_1(T* buff1, T* buff2){
+void DistributionSends<T>::reshape_1(T* buff1, T* buff2){
     int n_recvs = dims[2];
     int mini_pencil_size = local_grid_size[2];
     int send_per_rank = nlocal / n_recvs;
@@ -367,7 +414,7 @@ void Distribution<T>::reshape_1(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::unreshape_1(T* buff1, T* buff2){
+void DistributionSends<T>::unreshape_1(T* buff1, T* buff2){
 
     int z_dim = ng[2];
     int x_dim = local_grid_size[0] / dims[2];
@@ -388,7 +435,7 @@ void Distribution<T>::unreshape_1(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::reshape_2(T* buff1, T* buff2){
+void DistributionSends<T>::reshape_2(T* buff1, T* buff2){
     int n_recvs = dims[1];
     int mini_pencil_size = local_grid_size[1];
     int send_per_rank = nlocal / n_recvs;
@@ -414,7 +461,7 @@ void Distribution<T>::reshape_2(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::unreshape_2(T* buff1, T* buff2){
+void DistributionSends<T>::unreshape_2(T* buff1, T* buff2){
     //int n_sends = dims[0] * dims[2];
     //int n_recvs = dims[2];
     //int mini_pencil_size = local_grid_size[2];
@@ -442,7 +489,7 @@ void Distribution<T>::unreshape_2(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::reshape_3(T* buff1, T* buff2){
+void DistributionSends<T>::reshape_3(T* buff1, T* buff2){
     int n_recvs = dims[0] * dims[2];
     int mini_pencil_size = ng[0] / n_recvs;
     int send_per_rank = nlocal / n_recvs;
@@ -468,7 +515,7 @@ void Distribution<T>::reshape_3(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::unreshape_3(T* buff1, T* buff2){
+void DistributionSends<T>::unreshape_3(T* buff1, T* buff2){
 
     int z_dim = ng[0];
     int x_dim = local_grid_size[1] / dims[0];
@@ -489,7 +536,7 @@ void Distribution<T>::unreshape_3(T* buff1, T* buff2){
 }
 
 template<class T>
-void Distribution<T>::reshape_final(T* buff1, T* buff2, int ny, int nz){
+void DistributionSends<T>::reshape_final(T* buff1, T* buff2, int ny, int nz){
     #ifdef GPU
     launch_reshape_final(buff1,buff2,ny,nz,local_grid_size,nlocal,blockSize);
     #else
@@ -529,7 +576,7 @@ void Distribution<T>::reshape_final(T* buff1, T* buff2, int ny, int nz){
 
 #ifndef cudampi
 template<class T>
-void Distribution<T>::fillTest(T* buff){
+void DistributionSends<T>::fillTest(T* buff){
     int i = 0;
     for (int x = local_coords_start[0]; x < local_grid_size[0] + local_coords_start[0]; x++){
         for (int y = local_coords_start[1]; y < local_grid_size[1] + local_coords_start[1]; y++){
@@ -553,7 +600,7 @@ void Distribution<T>::fillTest(T* buff){
 #endif
 
 template<class T>
-void Distribution<T>::printTest(T* buff){
+void DistributionSends<T>::printTest(T* buff){
     MPI_Barrier(world_comm);
     T* printBuff = buff;
     #ifdef GPU
@@ -581,7 +628,7 @@ void Distribution<T>::printTest(T* buff){
 }
 #ifndef cudampi
 template<class T>
-void Distribution<T>::runTest(T* buff1, T* buff2){
+void DistributionSends<T>::runTest(T* buff1, T* buff2){
 
     fillTest(buff1);
 
@@ -606,5 +653,5 @@ void Distribution<T>::runTest(T* buff1, T* buff2){
 }
 #endif
 
-template class Distribution<complexFloat>;
-template class Distribution<complexDouble>;
+template class DistributionSends<complexFloat>;
+template class DistributionSends<complexDouble>;

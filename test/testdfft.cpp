@@ -13,8 +13,8 @@ uint64_t double_to_uint64_t(double d) {
   return i;
 }
 
-template<class T>
-void check_kspace(Distribution<T> &dist, T *a_){
+template<class T, class Dist>
+void check_kspace(Dist &dist, T *a_){
 
     T* a = (T*)malloc(sizeof(T) * dist.nlocal);
     cudaMemcpy(a,a_,sizeof(T)*dist.nlocal,cudaMemcpyDeviceToHost);
@@ -61,8 +61,8 @@ void check_kspace(Distribution<T> &dist, T *a_){
 
 }
 
-template<class T>
-void check_rspace(Distribution<T> &dist, T *a_){
+template<class T, class Dist>
+void check_rspace(Dist &dist, T *a_){
 
     T* a = (T*)malloc(sizeof(T) * dist.nlocal);
     cudaMemcpy(a,a_,sizeof(T)*dist.nlocal,cudaMemcpyDeviceToHost);
@@ -137,8 +137,8 @@ void cpy(T* buff1, T* buff2, int n){
 
 template<class T>
 void test(int ngx, int ngy, int ngz, int blockSize, int reps){
-    Distribution<T> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
-    Dfft<T> dfft(dist);
+    DistributionSends<T> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
+    Dfft<T,DistributionSends<T>> dfft(dist);
 
     T* buff1; cudaMalloc(&buff1,sizeof(T)*dist.buffSize());
     T* buff2; cudaMalloc(&buff2,sizeof(T)*dist.buffSize());
