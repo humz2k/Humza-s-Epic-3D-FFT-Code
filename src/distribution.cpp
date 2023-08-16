@@ -100,19 +100,6 @@ Distribution<T, Communicator>::~Distribution(){
     #endif
 }
 
-/*template<class T, template<class> class Communicator>
-void Distribution<T, Communicator>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
-    #if defined(GPU) && !defined(cudampi)
-    cudaMemcpy(h_buff1,src,nlocal * sizeof(T),cudaMemcpyDeviceToHost);
-    MPI_Alltoall(h_buff1,n * sizeof(T),MPI_BYTE,h_buff2,n * sizeof(T),MPI_BYTE,comm);
-    cudaMemcpy(dest,h_buff2,nlocal * sizeof(T),cudaMemcpyHostToDevice);
-    #else
-    MPI_Alltoall(src,n * sizeof(T),MPI_BYTE,dest,n * sizeof(T),MPI_BYTE,comm);
-    #endif
-}*/
-
-//template void Distribution::alltoall<complexFFT_t>(complexFFT_t*, complexFFT_t*, int, MPI_Comm);
-
 template<class T, template<class> class Communicator>
 void Distribution<T, Communicator>::pencils_1(T* buff1, T* buff2){
 

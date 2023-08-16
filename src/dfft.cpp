@@ -80,40 +80,6 @@ void Dfft<complexFloat,Distribution<complexFloat,PairSends>>::makePlans(complexF
 
 }
 
-template<>
-void Dfft<complexDouble,DistributionSends<complexDouble>>::makePlans(complexDouble* buff1_, complexDouble* buff2_){
-    buff1 = buff1_;
-    buff2 = buff2_;
-
-    #ifdef GPU
-    int nFFTs = nlocal / ng;
-    if (cufftPlan1d(&plan, ng, CUFFT_Z2Z, nFFTs) != CUFFT_SUCCESS){
-        printf("CUFFT error: Plan creation failed\n");
-        return;	
-    }
-    #endif
-
-    plansMade = true;
-
-}
-
-template<>
-void Dfft<complexFloat,DistributionSends<complexDouble>>::makePlans(complexFloat* buff1_, complexFloat* buff2_){
-    buff1 = buff1_;
-    buff2 = buff2_;
-
-    #ifdef GPU
-    int nFFTs = nlocal / ng;
-    if (cufftPlan1d(&plan, ng, CUFFT_C2C, nFFTs) != CUFFT_SUCCESS){
-        printf("CUFFT error: Plan creation failed\n");
-        return;	
-    }
-    #endif
-
-    plansMade = true;
-
-}
-
 template<class T, class Dist>
 void Dfft<T,Dist>::forward(){
     #ifdef DFFT_TIMING
@@ -194,27 +160,6 @@ void Dfft<complexFloat,Distribution<complexFloat,PairSends>>::exec1d(complexFloa
     #endif
 }
 
-template<>
-void Dfft<complexDouble,DistributionSends<complexDouble>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
-    #ifdef GPU
-    if (cufftExecZ2Z(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
-        printf("CUFFT error: ExecZ2Z Forward failed\n");
-        return;	
-    }
-    //cudaDeviceSynchronize();
-    #endif
-}
-template<>
-void Dfft<complexFloat,DistributionSends<complexFloat>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
-    #ifdef GPU
-    if (cufftExecC2C(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
-        printf("CUFFT error: ExecZ2Z Forward failed\n");
-        return;	
-    }
-    //cudaDeviceSynchronize();
-    #endif
-}
-
 template<class T, class Dist>
 void Dfft<T,Dist>::fft(int direction){
     dist.pencils_1(buff1,buff2);
@@ -252,6 +197,3 @@ template class Dfft<complexFloat,Distribution<complexFloat,AllToAll>>;
 template class Dfft<complexDouble,Distribution<complexDouble,AllToAll>>;
 template class Dfft<complexFloat,Distribution<complexFloat,PairSends>>;
 template class Dfft<complexDouble,Distribution<complexDouble,PairSends>>;
-
-template class Dfft<complexFloat,DistributionSends<complexFloat>>;
-template class Dfft<complexDouble,DistributionSends<complexDouble>>;
