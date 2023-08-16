@@ -11,8 +11,8 @@ export DFFT_CUDA_ARCH=""
 
 export DFFT_CUDA_MPI="-Dcudampi"
 
-export DFFT_CUDA_LIB="/sw/summit/cuda/11.0.3/lib64"
-export DFFT_CUDA_INC="/sw/summit/cuda/11.0.3/include"
+export DFFT_CUDA_LIB="/sw/summit/hip-cuda/5.1.0/lib"
+export DFFT_CUDA_INC="/sw/summit/hip-cuda/5.1.0/include"
 
 export DFFT_CUDA_LD="-lcufft -lcudart"
 

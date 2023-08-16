@@ -154,14 +154,7 @@ class Dfft{
         T* buff1;
         T* buff2;
         #ifdef GPU
-        #ifdef CUDA
         gpufftHandle plan;
-        #else
-        #ifdef HIP
-        gpufftHandle plan_forward;
-        gpufftHandle plan_inverse;
-        #endif
-        #endif
         #endif
         bool plansMade;
 

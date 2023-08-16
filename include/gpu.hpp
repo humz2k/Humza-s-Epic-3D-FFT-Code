@@ -48,18 +48,25 @@
 
 #ifdef HIP
 
-#include "hip/hip_runtime_api.h"
-#include "hip/hip_vector_types.h"
-#include "rocfft.h"
+#include <hip/hip_runtime_api.h>
+#include <hipfft/hipfft.h>
 
-#define GPUFFT_FORWARD 0
-#define GPUFFT_INVERSE 1
+#define GPUFFT_FORWARD HIPFFT_FORWARD
+#define GPUFFT_INVERSE HIPFFT_BACKWARD
+#define GPUFFT_Z2Z HIPFFT_Z2Z
+#define GPUFFT_C2C HIPFFT_C2C
+#define GPUFFT_SUCCESS HIPFFT_SUCCESS
+
+#define gpufftExecZ2Z hipfftExecZ2Z
+#define gpufftExecC2C hipfftExecC2C
 
 #define gpuStream_t hipStream_t
 
-#define gpufftHandle rocfft_plan
+#define gpufftHandle hipfftHandle
 
-#define gpufftDestroy rocfft_plan_destroy
+#define gpufftPlan1d hipfftPlan1d
+
+#define gpufftDestroy hipfftDestroy
 
 #define gpuMalloc hipMalloc
 
