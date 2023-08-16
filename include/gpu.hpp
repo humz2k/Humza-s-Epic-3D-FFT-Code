@@ -51,6 +51,9 @@
 #include <hip/hip_runtime_api.h>
 #include <hipfft.h>
 
+#define complexDouble hipfftDoubleComplex
+#define complexFloat hipfftComplex
+
 #define GPUFFT_FORWARD HIPFFT_FORWARD
 #define GPUFFT_INVERSE HIPFFT_BACKWARD
 #define GPUFFT_Z2Z HIPFFT_Z2Z
