@@ -41,7 +41,43 @@ inline void printTimingStats(MPI_Comm comm,        // comm for MPI_Allreduce()
   return;
 }
 
-template <class T>
+template<class T>
+class CollectiveCommunicator{
+    public:
+        #ifdef GPU
+        #ifndef cudampi
+        T* h_buff1;
+        T* h_buff2;
+        int buff_sz;
+        bool set;
+        #endif
+        #endif
+        CollectiveCommunicator();
+        //CollectiveCommunicator(int buff_sz);
+        ~CollectiveCommunicator();
+
+        void init(int buff_sz);
+
+        void alltoall(T* src, T* dest, int n_recv, MPI_Comm comm);
+
+        void query();
+};
+
+template<class T>
+class AllToAll : public CollectiveCommunicator<T>{
+    public:
+        void alltoall(T* src, T* dest, int n_recv, MPI_Comm comm);
+        void query();
+};
+
+template<class T>
+class PairSends : public CollectiveCommunicator<T>{
+    public:
+        void alltoall(T* src, T* dest, int n_recv, MPI_Comm comm);
+        void query();
+};
+
+template <class T, template<class> class Communicator>
 class Distribution{
     public:
         int ng[3];
@@ -54,6 +90,8 @@ class Distribution{
         int local_coords_start[3];
         MPI_Comm world_comm;
         MPI_Comm distcomms[4];
+
+        Communicator<T> CollectiveComm;
 
         double pencil_1_comm_time;
         double pencil_1_calc_time;

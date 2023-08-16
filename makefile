@@ -55,7 +55,7 @@ $(DFFT_GPU_LIB_DIR)/%.o: src/%.cpp | $(DFFT_LIB_DIR)
 $(DFFT_CUDA_LIB_DIR)/%.o: src/%.cu | $(DFFT_LIB_DIR)
 	$(DFFT_CUDA_CC) $(DFFT_CUDA_MPI) $(DFFT_INCLUDE) $(DFFT_CUDA_FLAGS) -c -o $@ $<
 
-$(DFFT_GPU_AR): $(DFFT_GPU_LIB_DIR)/distribution.o $(DFFT_GPU_LIB_DIR)/distribution_sends.o $(DFFT_CUDA_LIB_DIR)/reshape.o $(DFFT_GPU_LIB_DIR)/dfft.o
+$(DFFT_GPU_AR): $(DFFT_GPU_LIB_DIR)/collective_communicator.o $(DFFT_GPU_LIB_DIR)/distribution.o $(DFFT_GPU_LIB_DIR)/distribution_sends.o $(DFFT_CUDA_LIB_DIR)/reshape.o $(DFFT_GPU_LIB_DIR)/dfft.o
 	ar cr $@ $^
 
 $(DFFT_BUILD_DIR)/testdfft: test/testdfft.cpp $(DFFT_GPU_AR) | $(DFFT_BUILD_DIR)

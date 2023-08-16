@@ -2,8 +2,8 @@
 #include "reshape.hpp"
 #include <cassert>
 
-template<class T>
-Distribution<T>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSize_) : world_comm(comm), ng {ngx,ngy,ngz} , blockSize(blockSize_), dims {0,0,0}, tests(0) {
+template<class T, template<class> class Communicator>
+Distribution<T,Communicator>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int blockSize_) : world_comm(comm), ng {ngx,ngy,ngz} , blockSize(blockSize_), dims {0,0,0}, tests(0) {
     MPI_Comm_rank(world_comm,&world_rank);
     MPI_Comm_size(world_comm,&world_size);
 
@@ -36,6 +36,7 @@ Distribution<T>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int bloc
         #else
         printf("   not using cuda mpi (!!)\n");
         #endif
+        CollectiveComm.query();
         
     }
 
@@ -72,6 +73,8 @@ Distribution<T>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int bloc
     assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
     assert(ng[2] % (dims[0] * dims[2]) == 0);
 
+    CollectiveComm.init(buffSize());
+
     #ifdef GPU
     #ifndef cudampi
     h_buff1 = (T*)malloc(sizeof(T) * buffSize());
@@ -82,13 +85,13 @@ Distribution<T>::Distribution(MPI_Comm comm, int ngx, int ngy, int ngz, int bloc
     numBlocks = (nlocal + (blockSize - 1))/blockSize;
 }
 
-template<class T>
-int Distribution<T>::buffSize(){
+template<class T, template<class> class Communicator>
+int Distribution<T,  Communicator>::buffSize(){
     return nlocal;
 }
 
-template<class T>
-Distribution<T>::~Distribution(){
+template<class T, template<class> class Communicator>
+Distribution<T, Communicator>::~Distribution(){
     #ifdef GPU
     #ifndef cudampi
     free(h_buff1);
@@ -97,8 +100,8 @@ Distribution<T>::~Distribution(){
     #endif
 }
 
-template<class T>
-void Distribution<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
+/*template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
     #if defined(GPU) && !defined(cudampi)
     cudaMemcpy(h_buff1,src,nlocal * sizeof(T),cudaMemcpyDeviceToHost);
     MPI_Alltoall(h_buff1,n * sizeof(T),MPI_BYTE,h_buff2,n * sizeof(T),MPI_BYTE,comm);
@@ -106,19 +109,19 @@ void Distribution<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
     #else
     MPI_Alltoall(src,n * sizeof(T),MPI_BYTE,dest,n * sizeof(T),MPI_BYTE,comm);
     #endif
-}
+}*/
 
 //template void Distribution::alltoall<complexFFT_t>(complexFFT_t*, complexFFT_t*, int, MPI_Comm);
 
-template<class T>
-void Distribution<T>::pencils_1(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::pencils_1(T* buff1, T* buff2){
 
     //cudaDeviceSynchronize();
     #if DFFT_TIMING == 1
     double comm_start = MPI_Wtime();
     #endif
 
-    alltoall(buff1,buff2,(nlocal / dims[2]),distcomms[0]);
+    CollectiveComm.alltoall(buff1,buff2,(nlocal / dims[2]),distcomms[0]);
     
     #if DFFT_TIMING == 1
     double comm_end = MPI_Wtime();
@@ -128,8 +131,8 @@ void Distribution<T>::pencils_1(T* buff1, T* buff2){
     reshape_1(buff2,buff1);
 }
 
-template<class T>
-void Distribution<T>::pencils_2(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::pencils_2(T* buff1, T* buff2){
     unreshape_1(buff1,buff2);
 
     cudaDeviceSynchronize();
@@ -138,7 +141,7 @@ void Distribution<T>::pencils_2(T* buff1, T* buff2){
     double comm_start = MPI_Wtime();
     #endif
 
-    alltoall(buff2,buff1,(nlocal / dims[1]),distcomms[1]);
+    CollectiveComm.alltoall(buff2,buff1,(nlocal / dims[1]),distcomms[1]);
 
     #if DFFT_TIMING == 1
     double comm_end = MPI_Wtime();
@@ -148,8 +151,8 @@ void Distribution<T>::pencils_2(T* buff1, T* buff2){
     reshape_2(buff1,buff2);
 }
 
-template<class T>
-void Distribution<T>::pencils_3(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::pencils_3(T* buff1, T* buff2){
     unreshape_2(buff1,buff2);
 
     cudaDeviceSynchronize();
@@ -158,7 +161,7 @@ void Distribution<T>::pencils_3(T* buff1, T* buff2){
     double comm_start = MPI_Wtime();
     #endif
 
-    alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
+    CollectiveComm.alltoall(buff2,buff1,(nlocal / (dims[2] * dims[0])),distcomms[2]);
 
     #if DFFT_TIMING == 1
     double comm_end = MPI_Wtime();
@@ -168,8 +171,8 @@ void Distribution<T>::pencils_3(T* buff1, T* buff2){
     reshape_3(buff1,buff2);
 }
 
-template<class T>
-void Distribution<T>::return_pencils_sm(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::return_pencils_sm(T* buff1, T* buff2){
     unreshape_3(buff1,buff2);
 
     int dest_x_start = 0;
@@ -258,8 +261,8 @@ void Distribution<T>::return_pencils_sm(T* buff1, T* buff2){
 
 }
 
-template<class T>
-void Distribution<T>::return_pencils(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::return_pencils(T* buff1, T* buff2){
     unreshape_3(buff1,buff2);
 
     int dest_x_start = 0;
@@ -340,8 +343,8 @@ void Distribution<T>::return_pencils(T* buff1, T* buff2){
     reshape_final(buff1,buff2,y_send,n_recvs / y_send);
 }
 
-template<class T>
-void Distribution<T>::reshape_1(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::reshape_1(T* buff1, T* buff2){
     int n_recvs = dims[2];
     int mini_pencil_size = local_grid_size[2];
     int send_per_rank = nlocal / n_recvs;
@@ -366,8 +369,8 @@ void Distribution<T>::reshape_1(T* buff1, T* buff2){
     #endif
 }
 
-template<class T>
-void Distribution<T>::unreshape_1(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::unreshape_1(T* buff1, T* buff2){
 
     int z_dim = ng[2];
     int x_dim = local_grid_size[0] / dims[2];
@@ -387,8 +390,8 @@ void Distribution<T>::unreshape_1(T* buff1, T* buff2){
     #endif
 }
 
-template<class T>
-void Distribution<T>::reshape_2(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::reshape_2(T* buff1, T* buff2){
     int n_recvs = dims[1];
     int mini_pencil_size = local_grid_size[1];
     int send_per_rank = nlocal / n_recvs;
@@ -413,8 +416,8 @@ void Distribution<T>::reshape_2(T* buff1, T* buff2){
     #endif
 }
 
-template<class T>
-void Distribution<T>::unreshape_2(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::unreshape_2(T* buff1, T* buff2){
     //int n_sends = dims[0] * dims[2];
     //int n_recvs = dims[2];
     //int mini_pencil_size = local_grid_size[2];
@@ -441,8 +444,8 @@ void Distribution<T>::unreshape_2(T* buff1, T* buff2){
     #endif
 }
 
-template<class T>
-void Distribution<T>::reshape_3(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::reshape_3(T* buff1, T* buff2){
     int n_recvs = dims[0] * dims[2];
     int mini_pencil_size = ng[0] / n_recvs;
     int send_per_rank = nlocal / n_recvs;
@@ -467,8 +470,8 @@ void Distribution<T>::reshape_3(T* buff1, T* buff2){
     #endif
 }
 
-template<class T>
-void Distribution<T>::unreshape_3(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::unreshape_3(T* buff1, T* buff2){
 
     int z_dim = ng[0];
     int x_dim = local_grid_size[1] / dims[0];
@@ -488,8 +491,8 @@ void Distribution<T>::unreshape_3(T* buff1, T* buff2){
     #endif
 }
 
-template<class T>
-void Distribution<T>::reshape_final(T* buff1, T* buff2, int ny, int nz){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::reshape_final(T* buff1, T* buff2, int ny, int nz){
     #ifdef GPU
     launch_reshape_final(buff1,buff2,ny,nz,local_grid_size,nlocal,blockSize);
     #else
@@ -528,8 +531,8 @@ void Distribution<T>::reshape_final(T* buff1, T* buff2, int ny, int nz){
 }
 
 #ifndef cudampi
-template<class T>
-void Distribution<T>::fillTest(T* buff){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::fillTest(T* buff){
     int i = 0;
     for (int x = local_coords_start[0]; x < local_grid_size[0] + local_coords_start[0]; x++){
         for (int y = local_coords_start[1]; y < local_grid_size[1] + local_coords_start[1]; y++){
@@ -552,8 +555,8 @@ void Distribution<T>::fillTest(T* buff){
 }
 #endif
 
-template<class T>
-void Distribution<T>::printTest(T* buff){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::printTest(T* buff){
     MPI_Barrier(world_comm);
     T* printBuff = buff;
     #ifdef GPU
@@ -580,8 +583,8 @@ void Distribution<T>::printTest(T* buff){
     #endif
 }
 #ifndef cudampi
-template<class T>
-void Distribution<T>::runTest(T* buff1, T* buff2){
+template<class T, template<class> class Communicator>
+void Distribution<T, Communicator>::runTest(T* buff1, T* buff2){
 
     fillTest(buff1);
 
@@ -606,5 +609,7 @@ void Distribution<T>::runTest(T* buff1, T* buff2){
 }
 #endif
 
-template class Distribution<complexFloat>;
-template class Distribution<complexDouble>;
+template class Distribution<complexFloat,AllToAll>;
+template class Distribution<complexDouble,AllToAll>;
+template class Distribution<complexFloat,PairSends>;
+template class Distribution<complexDouble,PairSends>;
