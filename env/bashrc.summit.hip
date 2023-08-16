@@ -14,6 +14,6 @@ export DFFT_CUDA_MPI="-Dcudampi"
 export DFFT_CUDA_LIB="/sw/summit/hip-cuda/5.1.0/lib"
 export DFFT_CUDA_INC="/sw/summit/hip-cuda/5.1.0/include"
 
-export DFFT_CUDA_LD="-lhipfft"
+export DFFT_CUDA_LD="-lhipfft -lcudart"
 
 export DFFT_GPU="HIP"
