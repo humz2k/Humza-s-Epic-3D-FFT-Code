@@ -23,6 +23,8 @@ DFFT_CUDA_FLAGS ?= -lineinfo -Xptxas -v -Xcompiler="-fPIC" $(DFFT_CUDA_ARCH)
 
 DFFT_CUDA_MPI ?=
 
+DFFT_GPU ?= CUDA
+
 # MPI C compiler
 DFFT_MPI_CC ?= mpicc -O3
 
@@ -50,13 +52,13 @@ $(DFFT_BUILD_DIR):
 	mkdir -p $(DFFT_BUILD_DIR)
 
 $(DFFT_GPU_LIB_DIR)/%.o: src/%.cpp | $(DFFT_LIB_DIR)
-	$(DFFT_MPI_CXX) $(DFFT_CUDA_MPI) $(DFFT_INCLUDE) -c -o $@ $<
+	$(DFFT_MPI_CXX) $(DFFT_CUDA_MPI) -D$(DFFT_GPU) $(DFFT_INCLUDE) -c -o $@ $<
 
 $(DFFT_CUDA_LIB_DIR)/%.o: src/%.cu | $(DFFT_LIB_DIR)
-	$(DFFT_CUDA_CC) $(DFFT_CUDA_MPI) $(DFFT_INCLUDE) $(DFFT_CUDA_FLAGS) -c -o $@ $<
+	$(DFFT_CUDA_CC) $(DFFT_CUDA_MPI) -D$(DFFT_GPU) $(DFFT_INCLUDE) $(DFFT_CUDA_FLAGS) -c -o $@ $<
 
 $(DFFT_GPU_AR): $(DFFT_GPU_LIB_DIR)/collective_communicator.o $(DFFT_GPU_LIB_DIR)/distribution.o $(DFFT_CUDA_LIB_DIR)/reshape.o $(DFFT_GPU_LIB_DIR)/dfft.o
 	ar cr $@ $^
 
 $(DFFT_BUILD_DIR)/testdfft: test/testdfft.cpp $(DFFT_GPU_AR) | $(DFFT_BUILD_DIR)
-	$(DFFT_MPI_CXX) $(DFFT_CUDA_MPI) -DDFFT_PLATFORM=$(DFFT_PLATFORM) $(DFFT_INCLUDE) $^ $(DFFT_LD) $(DFFT_CUDA_LD) -o $@
+	$(DFFT_MPI_CXX) $(DFFT_CUDA_MPI) -D$(DFFT_GPU) -DDFFT_PLATFORM=$(DFFT_PLATFORM) $(DFFT_INCLUDE) $^ $(DFFT_LD) $(DFFT_CUDA_LD) -o $@

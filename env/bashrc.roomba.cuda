@@ -8,4 +8,6 @@ export DFFT_MPI_CXX="mpicxx -O3"
 
 export DFFT_CUDA_CC="nvcc -O3"
 
+export DFFT_GPU="CUDA"
+
 conda deactivate

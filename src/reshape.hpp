@@ -1,4 +1,4 @@
-#include "complex-type.hpp"
+#include "gpu.hpp"
 
 template<class T>
 void launch_reshape(T* buff1, T* buff2, int n_recvs, int mini_pencil_size, int send_per_rank, int pencils_per_rank, int nlocal, int blockSize);

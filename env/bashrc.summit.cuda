@@ -14,3 +14,5 @@ export DFFT_CUDA_LIB="/sw/summit/cuda/11.0.3/lib64"
 export DFFT_CUDA_INC="/sw/summit/cuda/11.0.3/include"
 
 export DFFT_CUDA_ARCH="-lcufft -lcudart"
+
+export DFFT_GPU="CUDA"

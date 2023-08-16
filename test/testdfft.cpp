@@ -140,8 +140,8 @@ void test(int ngx, int ngy, int ngz, int blockSize, int reps){
     Distribution<T,Communicator> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
     Dfft<T,Distribution<T,Communicator>> dfft(dist);
 
-    T* buff1; cudaMalloc(&buff1,sizeof(T)*dist.buffSize());
-    T* buff2; cudaMalloc(&buff2,sizeof(T)*dist.buffSize());
+    T* buff1; gpuMalloc(&buff1,sizeof(T)*dist.buffSize());
+    T* buff2; gpuMalloc(&buff2,sizeof(T)*dist.buffSize());
 
     dfft.makePlans(buff1,buff2);
 
@@ -160,14 +160,14 @@ void test(int ngx, int ngy, int ngz, int blockSize, int reps){
         check_rspace(dist,buff1);
     }
 
-    cudaFree(buff1);
-    cudaFree(buff2);
+    gpuFree(buff1);
+    gpuFree(buff2);
 }
 
 int main(int argc, char** argv){
 
     #ifdef GPU
-    cudaFree(0);
+    gpuFree(0);
     #endif
 
     MPI_Init(NULL,NULL);

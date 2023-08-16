@@ -1,4 +1,4 @@
-#include "gpu.hpp"
+#include "reshape.hpp"
 
 template<class T>
 __global__ void reshape_kernel(const T* __restrict buff1, T* __restrict buff2, int n_recvs, int mini_pencil_size, int send_per_rank, int pencils_per_rank, int nlocal){
