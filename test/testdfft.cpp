@@ -135,10 +135,10 @@ void cpy(T* buff1, T* buff2, int n){
     }
 }
 
-template<class T>
+template<class T, template<class> class Communicator>
 void test(int ngx, int ngy, int ngz, int blockSize, int reps){
-    Distribution<T,PairSends> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
-    Dfft<T,Distribution<T,PairSends>> dfft(dist);
+    Distribution<T,Communicator> dist(MPI_COMM_WORLD,ngx,ngy,ngz,blockSize);
+    Dfft<T,Distribution<T,Communicator>> dfft(dist);
 
     T* buff1; cudaMalloc(&buff1,sizeof(T)*dist.buffSize());
     T* buff2; cudaMalloc(&buff2,sizeof(T)*dist.buffSize());
@@ -187,8 +187,7 @@ int main(int argc, char** argv){
 
     if(world_rank == 0)printf("Testing on platform: %s\n",TOSTRING(DFFT_PLATFORM));
 
-    test<complexDouble>(ng,ng,ng,blockSize,reps);
-    //test<complexFloat>(ng,ng,ng,blockSize,reps);
+    test<complexDouble,AllToAll>(ng,ng,ng,blockSize,reps);
 
     MPI_Finalize();
     return 0;

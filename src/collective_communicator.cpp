@@ -31,12 +31,12 @@ CollectiveCommunicator<T>::~CollectiveCommunicator(){
 
 template<class T>
 void AllToAll<T>::query(){
-    printf("   Using MPI_Alltoall Communicator!\n");
+    printf("   Using MPI_Alltoall Communication!\n");
 }
 
 template<class T>
 void PairSends<T>::query(){
-    printf("   Using MPI_Isend/MPI_Irecv Communicator!\n");
+    printf("   Using MPI_Isend/MPI_Irecv Communication!\n");
 }
 
 template<class T>
@@ -78,7 +78,7 @@ void PairSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
         
     } else {
         
-        MPI_Request reqs[comm_size];
+        MPI_Request reqs[comm_size*2];
         for (int i = 0; i < comm_size; i++){
             if (i == comm_rank){
                 #if defined(GPU) && !defined(cudampi)
@@ -90,16 +90,15 @@ void PairSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
                 #endif
                 continue;
             } else {
-                MPI_Request req;
-                MPI_Isend(&src_buff[i * n],n * sizeof(T),MPI_BYTE,i,0,comm,&req);
-                MPI_Request_free(&req);
-                MPI_Irecv(&dest_buff[i * n],n * sizeof(T),MPI_BYTE,i,0,comm,&reqs[i]);
+                MPI_Isend(&src_buff[i * n],n * sizeof(T),MPI_BYTE,i,0,comm,&reqs[i*2]);
+                MPI_Irecv(&dest_buff[i * n],n * sizeof(T),MPI_BYTE,i,0,comm,&reqs[i*2 + 1]);
             }
         }
 
         for (int i = 0; i < comm_size; i++){
             if (i == comm_rank)continue;
-            MPI_Wait(&reqs[i],MPI_STATUS_IGNORE);
+            MPI_Wait(&reqs[i*2],MPI_STATUS_IGNORE);
+            MPI_Wait(&reqs[i*2 + 1],MPI_STATUS_IGNORE);
         }
     }
 
