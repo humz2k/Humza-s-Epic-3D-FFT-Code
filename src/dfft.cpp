@@ -175,6 +175,8 @@ void Dfft<T,Dist>::fft(int direction){
     exec1d(buff1,buff2,direction);
 
     dist.return_pencils(buff2,buff1);
+
+    cudaDeviceSynchronize();
 }
 
 template<class T, class Dist>
