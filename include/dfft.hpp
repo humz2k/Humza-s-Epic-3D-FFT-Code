@@ -45,11 +45,11 @@ template<class T>
 class CollectiveCommunicator{
     public:
         #ifdef GPU
+        bool set;
         #ifndef cudampi
         T* h_buff1;
         T* h_buff2;
         int buff_sz;
-        bool set;
         #endif
         #endif
         CollectiveCommunicator();
