@@ -31,8 +31,6 @@
 *.out
 *.app
 
-*.txt
-
 *.ipynb
 
 build
