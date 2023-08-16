@@ -1,0 +1,22 @@
+[e04n04:2337461] *** An error occurred in MPI_Alltoall
+[e04n04:2337461] *** reported by process [1,1]
+[e04n04:2337461] *** on communicator MPI COMMUNICATOR 5 SPLIT FROM 0
+[e04n04:2337461] *** MPI_ERR_COUNT: invalid count argument
+[e04n04:2337461] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
+[e04n04:2337461] ***    and potentially your MPI job)
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@batch1>
+Subject: Job 3111650: <gpua2affttest> in cluster <summit> Exited
+
+Job <gpua2affttest> was submitted from host <login5> by user <hqureshi> in cluster <summit> at Wed Aug 16 05:40:22 2023
+Job was executed on host(s) <1*batch1>, in queue <batch>, as user <hqureshi> in cluster <summit> at Wed Aug 16 05:41:15 2023
+                            <42*e04n04>
+</ccs/home/hqureshi> was used as the home directory.
+</ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/scripts> was used as the working directory.
+Started at Wed Aug 16 05:41:15 2023
+Terminated at Wed Aug 16 05:41:35 2023
+Results reported at Wed Aug 16 05:41:35 2023
+
+The output (if any) is above this job summary.
+
