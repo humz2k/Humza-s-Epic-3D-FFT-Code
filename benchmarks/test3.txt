@@ -1,4 +1,4 @@
-Testing on platform: piranha
+Testing on platform: summit
 Distribution:
    ng              = [256 256 256]
    dims            = [4 2 2]
