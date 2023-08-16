@@ -1,5 +1,5 @@
 #include <mpi.h>
-#include "complex-type.hpp"
+#include "gpu.hpp"
 #include <stdio.h>
 
 #define DFFT_TIMING 1
@@ -109,7 +109,7 @@ class Distribution{
             #endif
         #endif
 
-        cudaStream_t memcpystream;
+        gpuStream_t memcpystream;
 
         int blockSize;
         int numBlocks;
@@ -154,7 +154,7 @@ class Dfft{
         T* buff1;
         T* buff2;
         #ifdef GPU
-        cufftHandle plan;
+        gpufftHandle plan;
         #endif
         bool plansMade;
 

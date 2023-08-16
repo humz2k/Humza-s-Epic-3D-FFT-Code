@@ -9,7 +9,7 @@ Dfft<T, Dist>::Dfft(Dist& dist_) : dist(dist_){
 
 template<class T, class Dist>
 Dfft<T, Dist>::~Dfft(){
-    if (plansMade)cufftDestroy(plan);
+    if (plansMade)gpufftDestroy(plan);
 }
 
 template<>
@@ -19,7 +19,7 @@ void Dfft<complexDouble,Distribution<complexDouble,AllToAll>>::makePlans(complex
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
-    if (cufftPlan1d(&plan, ng, CUFFT_Z2Z, nFFTs) != CUFFT_SUCCESS){
+    if (gpufftPlan1d(&plan, ng, GPUFFT_Z2Z, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
@@ -36,7 +36,7 @@ void Dfft<complexFloat,Distribution<complexFloat,AllToAll>>::makePlans(complexFl
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
-    if (cufftPlan1d(&plan, ng, CUFFT_C2C, nFFTs) != CUFFT_SUCCESS){
+    if (gpufftPlan1d(&plan, ng, GPUFFT_C2C, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
@@ -53,7 +53,7 @@ void Dfft<complexDouble,Distribution<complexDouble,PairSends>>::makePlans(comple
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
-    if (cufftPlan1d(&plan, ng, CUFFT_Z2Z, nFFTs) != CUFFT_SUCCESS){
+    if (gpufftPlan1d(&plan, ng, GPUFFT_Z2Z, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
@@ -70,7 +70,7 @@ void Dfft<complexFloat,Distribution<complexFloat,PairSends>>::makePlans(complexF
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
-    if (cufftPlan1d(&plan, ng, CUFFT_C2C, nFFTs) != CUFFT_SUCCESS){
+    if (gpufftPlan1d(&plan, ng, GPUFFT_C2C, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
@@ -121,7 +121,7 @@ void Dfft<T,Dist>::backward(){
 template<>
 void Dfft<complexDouble,Distribution<complexDouble,AllToAll>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
     #ifdef GPU
-    if (cufftExecZ2Z(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
+    if (gpufftExecZ2Z(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
@@ -131,7 +131,7 @@ void Dfft<complexDouble,Distribution<complexDouble,AllToAll>>::exec1d(complexDou
 template<>
 void Dfft<complexFloat,Distribution<complexFloat,AllToAll>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
     #ifdef GPU
-    if (cufftExecC2C(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
+    if (gpufftExecC2C(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
@@ -142,7 +142,7 @@ void Dfft<complexFloat,Distribution<complexFloat,AllToAll>>::exec1d(complexFloat
 template<>
 void Dfft<complexDouble,Distribution<complexDouble,PairSends>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
     #ifdef GPU
-    if (cufftExecZ2Z(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
+    if (gpufftExecZ2Z(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
@@ -152,7 +152,7 @@ void Dfft<complexDouble,Distribution<complexDouble,PairSends>>::exec1d(complexDo
 template<>
 void Dfft<complexFloat,Distribution<complexFloat,PairSends>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
     #ifdef GPU
-    if (cufftExecC2C(plan, buff1_, buff2_, direction) != CUFFT_SUCCESS){
+    if (gpufftExecC2C(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
@@ -176,19 +176,19 @@ void Dfft<T,Dist>::fft(int direction){
 
     dist.return_pencils(buff2,buff1);
 
-    cudaDeviceSynchronize();
+    gpuDeviceSynchronize();
 }
 
 template<class T, class Dist>
 void Dfft<T,Dist>::fillDelta(){
     //complexFFT_t* fillArray = buff1;
     #ifdef GPU
-    cudaMemset(buff1,0,sizeof(T)*dist.nlocal);
+    gpuMemset(buff1,0,sizeof(T)*dist.nlocal);
     T origin;
     origin.x = 1;
     origin.y = 0;
     if ((dist.coords[0] == 0) && (dist.coords[1] == 0) && (dist.coords[2] == 0)){
-        cudaMemcpy(buff1,&origin,sizeof(T),cudaMemcpyHostToDevice);
+        gpuMemcpy(buff1,&origin,sizeof(T),gpuMemcpyHostToDevice);
     }
     #endif
 }

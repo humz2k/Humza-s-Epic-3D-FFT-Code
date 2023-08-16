@@ -43,9 +43,9 @@ template<class T>
 void AllToAll<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
     #if defined(GPU) && !defined(cudampi)
     //printf("buff_sz = %d\n",this->buff_sz);
-    cudaMemcpy(this->h_buff1,src,this->buff_sz * sizeof(T),cudaMemcpyDeviceToHost);
+    gpuMemcpy(this->h_buff1,src,this->buff_sz * sizeof(T),gpuMemcpyDeviceToHost);
     MPI_Alltoall(this->h_buff1,n * sizeof(T),MPI_BYTE,this->h_buff2,n * sizeof(T),MPI_BYTE,comm);
-    cudaMemcpy(dest,this->h_buff2,this->buff_sz * sizeof(T),cudaMemcpyHostToDevice);
+    gpuMemcpy(dest,this->h_buff2,this->buff_sz * sizeof(T),gpuMemcpyHostToDevice);
     #else
     MPI_Alltoall(src,n * sizeof(T),MPI_BYTE,dest,n * sizeof(T),MPI_BYTE,comm);
     #endif
@@ -58,7 +58,7 @@ void PairSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
     #if defined(GPU) && !defined(cudampi)
     T* src_buff = this->h_buff1;
     T* dest_buff = this->h_buff2;
-    cudaMemcpy(src_buff,src,this->buff_sz * sizeof(T),cudaMemcpyDeviceToHost);
+    gpuMemcpy(src_buff,src,this->buff_sz * sizeof(T),gpuMemcpyDeviceToHost);
     #else
     T* src_buff = src;
     T* dest_buff = dest;
@@ -73,7 +73,7 @@ void PairSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
             dest_buff[comm_rank * n + j] = src_buff[comm_rank * n + j];
         }
         #else
-        cudaMemcpy(&dest_buff[comm_rank * n],&src_buff[comm_rank * n],n * sizeof(T),cudaMemcpyDeviceToDevice);
+        gpuMemcpy(&dest_buff[comm_rank * n],&src_buff[comm_rank * n],n * sizeof(T),gpuMemcpyDeviceToDevice);
         #endif
         
     } else {
@@ -86,7 +86,7 @@ void PairSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
                     dest_buff[comm_rank * n + j] = src_buff[comm_rank * n + j];
                 }
                 #else
-                cudaMemcpy(&dest_buff[comm_rank * n],&src_buff[comm_rank * n],n * sizeof(T),cudaMemcpyDeviceToDevice);
+                gpuMemcpy(&dest_buff[comm_rank * n],&src_buff[comm_rank * n],n * sizeof(T),gpuMemcpyDeviceToDevice);
                 #endif
                 continue;
             } else {
@@ -103,7 +103,7 @@ void PairSends<T>::alltoall(T* src, T* dest, int n, MPI_Comm comm){
     }
 
     #if defined(GPU) && !defined(cudampi)
-    cudaMemcpy(dest,this->h_buff2,this->buff_sz * sizeof(T),cudaMemcpyHostToDevice);
+    gpuMemcpy(dest,this->h_buff2,this->buff_sz * sizeof(T),gpuMemcpyHostToDevice);
     #endif
     
 }

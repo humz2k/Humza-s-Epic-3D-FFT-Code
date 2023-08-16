@@ -122,7 +122,7 @@ template<class T, template<class> class Communicator>
 void Distribution<T, Communicator>::pencils_2(T* buff1, T* buff2){
     unreshape_1(buff1,buff2);
 
-    cudaDeviceSynchronize();
+    gpuDeviceSynchronize();
 
     #if DFFT_TIMING == 1
     double comm_start = MPI_Wtime();
@@ -142,7 +142,7 @@ template<class T, template<class> class Communicator>
 void Distribution<T, Communicator>::pencils_3(T* buff1, T* buff2){
     unreshape_2(buff1,buff2);
 
-    cudaDeviceSynchronize();
+    gpuDeviceSynchronize();
 
     #if DFFT_TIMING == 1
     double comm_start = MPI_Wtime();
@@ -174,7 +174,7 @@ void Distribution<T, Communicator>::return_pencils_sm(T* buff1, T* buff2){
 
     int n_recvs = dims[0];
 
-    cudaDeviceSynchronize();
+    gpuDeviceSynchronize();
 
     #if DFFT_TIMING == 1
     double comm_start = MPI_Wtime();
@@ -188,7 +188,7 @@ void Distribution<T, Communicator>::return_pencils_sm(T* buff1, T* buff2){
     #ifndef cudampi
     src_buff = h_buff2;
     dest_buff = h_buff1;
-    cudaMemcpy(h_buff2,buff2,sizeof(T)*nlocal,cudaMemcpyDeviceToHost);
+    gpuMemcpy(h_buff2,buff2,sizeof(T)*nlocal,gpuMemcpyDeviceToHost);
     #endif
     #endif
 
@@ -235,7 +235,7 @@ void Distribution<T, Communicator>::return_pencils_sm(T* buff1, T* buff2){
 
     #ifdef GPU
     #ifndef cudampi
-    cudaMemcpy(buff1,h_buff1,sizeof(T)*nlocal,cudaMemcpyHostToDevice);
+    gpuMemcpy(buff1,h_buff1,sizeof(T)*nlocal,gpuMemcpyHostToDevice);
     #endif
     #endif
 
@@ -264,7 +264,7 @@ void Distribution<T, Communicator>::return_pencils(T* buff1, T* buff2){
 
     int n_recvs = dims[0];
 
-    cudaDeviceSynchronize();
+    gpuDeviceSynchronize();
 
     #if DFFT_TIMING == 1
     double comm_start = MPI_Wtime();
@@ -276,7 +276,7 @@ void Distribution<T, Communicator>::return_pencils(T* buff1, T* buff2){
     #ifndef cudampi
     src_buff = h_buff2;
     dest_buff = h_buff1;
-    cudaMemcpy(h_buff2,buff2,sizeof(T)*nlocal,cudaMemcpyDeviceToHost);
+    gpuMemcpy(h_buff2,buff2,sizeof(T)*nlocal,gpuMemcpyDeviceToHost);
     #endif
     #endif
 
@@ -318,7 +318,7 @@ void Distribution<T, Communicator>::return_pencils(T* buff1, T* buff2){
 
     #ifdef GPU
     #ifndef cudampi
-    cudaMemcpy(buff1,h_buff1,sizeof(T)*nlocal,cudaMemcpyHostToDevice);
+    gpuMemcpy(buff1,h_buff1,sizeof(T)*nlocal,gpuMemcpyHostToDevice);
     #endif
     #endif
 
@@ -537,7 +537,7 @@ void Distribution<T, Communicator>::fillTest(T* buff){
         }
     }
     #ifdef GPU
-    cudaMemcpy(buff,h_buff1,sizeof(complexFFT_t)*nlocal,cudaMemcpyHostToDevice);
+    gpuMemcpy(buff,h_buff1,sizeof(T)*nlocal,gpuMemcpyHostToDevice);
     #endif
 }
 #endif
@@ -548,7 +548,7 @@ void Distribution<T, Communicator>::printTest(T* buff){
     T* printBuff = buff;
     #ifdef GPU
     printBuff = (T*)malloc(sizeof(T)*nlocal);
-    cudaMemcpy(printBuff,buff,sizeof(T)*nlocal,cudaMemcpyDeviceToHost);
+    gpuMemcpy(printBuff,buff,sizeof(T)*nlocal,gpuMemcpyDeviceToHost);
     #endif
 
     for (int rank = 0; rank < world_size; rank++){
