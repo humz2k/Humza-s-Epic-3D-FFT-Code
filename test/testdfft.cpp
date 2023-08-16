@@ -186,6 +186,12 @@ int main(int argc, char** argv){
     MPI_Comm_rank(MPI_COMM_WORLD,&world_rank);
 
     if(world_rank == 0)printf("Testing on platform: %s\n",TOSTRING(DFFT_PLATFORM));
+    #ifdef CUDA
+    if(world_rank == 0)printf("   Compiled with CUDA\n");
+    #endif
+    #ifdef HIP
+    if(world_rank == 0)printf("   Compiled with HIP\n");
+    #endif
 
     test<complexDouble,AllToAll>(ng,ng,ng,blockSize,reps);
 
