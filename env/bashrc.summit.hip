@@ -1,7 +1,7 @@
 export DFFT_PLATFORM="summit"
 
 module load gcc
-module load cuda
+module load cuda/11.4.0
 module load hip-cuda
 
 export DFFT_CUDA_CC="hipcc"
