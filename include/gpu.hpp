@@ -75,6 +75,8 @@
 
 #define gpuMemcpy hipMemcpy
 
+#define gpuMemset hipMemset
+
 #define gpuDeviceSynchronize hipDeviceSynchronize
 
 #define gpuMemcpyHostToDevice hipMemcpyHostToDevice
