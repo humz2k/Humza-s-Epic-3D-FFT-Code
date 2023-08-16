@@ -5,11 +5,17 @@ Dfft<T, Dist>::Dfft(Dist& dist_) : dist(dist_){
     ng = dist.ng[0];
     nlocal = dist.nlocal;
     plansMade = false;
+    #ifdef HIP
+    rocfft_setup();
+    #endif
 }
 
 template<class T, class Dist>
 Dfft<T, Dist>::~Dfft(){
     if (plansMade)gpufftDestroy(plan);
+    #ifdef HIP
+    rocfft_cleanup();
+    #endif
 }
 
 template<>
@@ -19,10 +25,17 @@ void Dfft<complexDouble,Distribution<complexDouble,AllToAll>>::makePlans(complex
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
+    #ifdef CUDA
     if (gpufftPlan1d(&plan, ng, GPUFFT_Z2Z, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
+    #else
+    #ifdef HIP
+    rocfft_plan_create(&plan_forward,rocfft_placement_notinplace,rocfft_transform_type_complex_forward,rocfft_precision_double,1,&ng,&nFFTs,nullptr);
+    rocfft_plan_create(&plan_inverse,rocfft_placement_notinplace,rocfft_transform_type_complex_inverse,rocfft_precision_double,1,&ng,&nFFTs,nullptr);
+    #endif
+    #endif
     #endif
 
     plansMade = true;
@@ -36,10 +49,17 @@ void Dfft<complexFloat,Distribution<complexFloat,AllToAll>>::makePlans(complexFl
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
+    #ifdef CUDA
     if (gpufftPlan1d(&plan, ng, GPUFFT_C2C, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
+    #else
+    #ifdef HIP
+    rocfft_plan_create(&plan_forward,rocfft_placement_notinplace,rocfft_transform_type_complex_forward,rocfft_precision_single,1,&ng,&nFFTs,nullptr);
+    rocfft_plan_create(&plan_inverse,rocfft_placement_notinplace,rocfft_transform_type_complex_inverse,rocfft_precision_single,1,&ng,&nFFTs,nullptr);
+    #endif
+    #endif
     #endif
 
     plansMade = true;
@@ -53,10 +73,17 @@ void Dfft<complexDouble,Distribution<complexDouble,PairSends>>::makePlans(comple
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
+    #ifdef CUDA
     if (gpufftPlan1d(&plan, ng, GPUFFT_Z2Z, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
+    #else
+    #ifdef HIP
+    rocfft_plan_create(&plan_forward,rocfft_placement_notinplace,rocfft_transform_type_complex_forward,rocfft_precision_double,1,&ng,&nFFTs,nullptr);
+    rocfft_plan_create(&plan_inverse,rocfft_placement_notinplace,rocfft_transform_type_complex_inverse,rocfft_precision_double,1,&ng,&nFFTs,nullptr);
+    #endif
+    #endif
     #endif
 
     plansMade = true;
@@ -70,10 +97,17 @@ void Dfft<complexFloat,Distribution<complexFloat,PairSends>>::makePlans(complexF
 
     #ifdef GPU
     int nFFTs = nlocal / ng;
+    #ifdef CUDA
     if (gpufftPlan1d(&plan, ng, GPUFFT_C2C, nFFTs) != GPUFFT_SUCCESS){
         printf("CUFFT error: Plan creation failed\n");
         return;	
     }
+    #else
+    #ifdef HIP
+    rocfft_plan_create(&plan_forward,rocfft_placement_notinplace,rocfft_transform_type_complex_forward,rocfft_precision_single,1,&ng,&nFFTs,nullptr);
+    rocfft_plan_create(&plan_inverse,rocfft_placement_notinplace,rocfft_transform_type_complex_inverse,rocfft_precision_single,1,&ng,&nFFTs,nullptr);
+    #endif
+    #endif
     #endif
 
     plansMade = true;
@@ -85,7 +119,7 @@ void Dfft<T,Dist>::forward(){
     #ifdef DFFT_TIMING
     double start = MPI_Wtime();
     #endif
-    fft(CUFFT_FORWARD);
+    fft(GPUFFT_FORWARD);
     #ifdef DFFT_TIMING
     double stop = MPI_Wtime();
     printTimingStats(MPI_COMM_WORLD,"FORWARD  ",stop-start);
@@ -104,7 +138,7 @@ void Dfft<T,Dist>::backward(){
     #ifdef DFFT_TIMING
     double start = MPI_Wtime();
     #endif
-    fft(CUFFT_INVERSE);
+    fft(GPUFFT_INVERSE);
     #ifdef DFFT_TIMING
     double stop = MPI_Wtime();
     printTimingStats(MPI_COMM_WORLD,"BACKWARD ",stop-start);
@@ -121,20 +155,41 @@ void Dfft<T,Dist>::backward(){
 template<>
 void Dfft<complexDouble,Distribution<complexDouble,AllToAll>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
     #ifdef GPU
+    #ifdef CUDA
     if (gpufftExecZ2Z(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
+    #else
+    #ifdef HIP
+    if (direction == GPUFFT_FORWARD){
+        rocfft_execute(plan_forward,(void**)&buff1_,(void**)&buff2_,nullptr);
+    } else {
+        rocfft_execute(plan_inverse,(void**)&buff1_,(void**)&buff2_,nullptr);
+    }
+    #endif
+    #endif
     //cudaDeviceSynchronize();
     #endif
 }
 template<>
 void Dfft<complexFloat,Distribution<complexFloat,AllToAll>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
     #ifdef GPU
+    #ifdef CUDA
     if (gpufftExecC2C(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
+    //cudaDeviceSynchronize();
+    #else
+    #ifdef HIP
+    if (direction == GPUFFT_FORWARD){
+        rocfft_execute(plan_forward,(void**)&buff1_,(void**)&buff2_,nullptr);
+    } else {
+        rocfft_execute(plan_inverse,(void**)&buff1_,(void**)&buff2_,nullptr);
+    }
+    #endif
+    #endif
     //cudaDeviceSynchronize();
     #endif
 }
@@ -142,20 +197,42 @@ void Dfft<complexFloat,Distribution<complexFloat,AllToAll>>::exec1d(complexFloat
 template<>
 void Dfft<complexDouble,Distribution<complexDouble,PairSends>>::exec1d(complexDouble* buff1_, complexDouble* buff2_, int direction){
     #ifdef GPU
+    #ifdef CUDA
     if (gpufftExecZ2Z(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
+    //cudaDeviceSynchronize();
+    #else
+    #ifdef HIP
+    if (direction == GPUFFT_FORWARD){
+        rocfft_execute(plan_forward,(void**)&buff1_,(void**)&buff2_,nullptr);
+    } else {
+        rocfft_execute(plan_inverse,(void**)&buff1_,(void**)&buff2_,nullptr);
+    }
+    #endif
+    #endif
     //cudaDeviceSynchronize();
     #endif
 }
 template<>
 void Dfft<complexFloat,Distribution<complexFloat,PairSends>>::exec1d(complexFloat* buff1_, complexFloat* buff2_, int direction){
     #ifdef GPU
+    #ifdef CUDA
     if (gpufftExecC2C(plan, buff1_, buff2_, direction) != GPUFFT_SUCCESS){
         printf("CUFFT error: ExecZ2Z Forward failed\n");
         return;	
     }
+    //cudaDeviceSynchronize();
+    #else
+    #ifdef HIP
+    if (direction == GPUFFT_FORWARD){
+        rocfft_execute(plan_forward,(void**)&buff1_,(void**)&buff2_,nullptr);
+    } else {
+        rocfft_execute(plan_inverse,(void**)&buff1_,(void**)&buff2_,nullptr);
+    }
+    #endif
+    #endif
     //cudaDeviceSynchronize();
     #endif
 }

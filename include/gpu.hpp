@@ -18,6 +18,8 @@
 #define GPUFFT_Z2Z CUFFT_Z2Z
 #define GPUFFT_C2C CUFFT_C2C
 #define GPUFFT_SUCCESS CUFFT_SUCCESS
+#define GPUFFT_FORWARD CUFFT_FORWARD
+#define GPUFFT_INVERSE CUFFT_INVERSE
 
 #define gpufftExecZ2Z cufftExecZ2Z
 #define gpufftExecC2C cufftExecC2C
@@ -50,7 +52,14 @@
 #include "hip/hip_vector_types.h"
 #include "rocfft.h"
 
+#define GPUFFT_FORWARD 0
+#define GPUFFT_INVERSE 1
+
 #define gpuStream_t hipStream_t
+
+#define gpufftHandle rocfft_plan
+
+#define gpufftDestroy rocfft_plan_destroy
 
 #define gpuMalloc hipMalloc
 
