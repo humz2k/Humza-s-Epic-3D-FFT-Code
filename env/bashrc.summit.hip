@@ -4,8 +4,8 @@ module load gcc
 module load cuda/11.4.0
 module load hip-cuda
 
-export DFFT_CUDA_CC="hipcc"
-export DFFT_MPI_CXX="mpic++ -O3"
+export DFFT_CUDA_CC="hipcc -D__HIP_PLATFORM_NVIDIA__"
+export DFFT_MPI_CXX="mpic++ -O3 -D__HIP_PLATFORM_NVIDIA__"
 export DFFT_CUDA_FLAGS="-I/sw/summit/spectrum_mpi/10.1.0.2-20161130/include/"
 export DFFT_CUDA_ARCH=""
 

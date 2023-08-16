@@ -49,7 +49,7 @@
 #ifdef HIP
 
 #include <hip/hip_runtime_api.h>
-#include <hipfft/hipfft.h>
+#include <hipfft.h>
 
 #define GPUFFT_FORWARD HIPFFT_FORWARD
 #define GPUFFT_INVERSE HIPFFT_BACKWARD
