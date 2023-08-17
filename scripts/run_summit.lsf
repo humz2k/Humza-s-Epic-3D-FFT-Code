@@ -2,8 +2,8 @@
 # Begin LSF Directives
 #BSUB -P HEP114
 #BSUB -W 0:10
-#BSUB -nnodes 2
-#BSUB -o HIP_Test.o%J
+#BSUB -nnodes 4
+#BSUB -o CUDA_Test.o%J
 #BSUB -J gpua2affttest
 
-jsrun --smpiargs="-gpu" -n8 -a1 -c1 -g1 -r4 $HOME/Humza-s-Epic-3D-FFT-Code/build/testdfft 20 64 256
+jsrun --smpiargs="-gpu" -n16 -a1 -c1 -g1 -r4 $HOME/Humza-s-Epic-3D-FFT-Code/build/testdfft 20 64 256

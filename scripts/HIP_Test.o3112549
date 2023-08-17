@@ -1,0 +1,99 @@
+[e07n17:514769] *** Process received signal ***
+[e07n17:514769] Signal: Segmentation fault (11)
+[e07n17:514769] Signal code: Invalid permissions (2)
+[e07n17:514769] Failing at address: 0x200054200000
+[e07n17:514769] [ 0] linux-vdso64.so.1(__kernel_sigtramp_rt64+0x0)[0x2000000504d8]
+[e07n17:514769] [ 1] /lib64/power9/libc.so.6(+0xad7fc)[0x20000090d7fc]
+[e07n17:514769] [ 2] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libopen-pal.so.3(opal_datatype_copy_content_same_ddt+0xc0)[0x20001699b690]
+[e07n17:514769] [ 3] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_datatype_sndrcv+0x6c0)[0x2000002db1e0]
+[e07n17:514769] [ 4] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_coll_base_alltoall_intra_basic_linear+0xb0)[0x2000003470d0]
+[e07n17:514769] [e07n17:514770] *** Process received signal ***
+[e07n17:514770] Signal: Segmentation fault (11)
+[e07n17:514770] Signal code: Invalid permissions (2)
+[e07n17:514770] Failing at address: 0x200053200000
+[e07n17:514770] [ 0] linux-vdso64.so.1(__kernel_sigtramp_rt64+0x0)[0x2000000504d8]
+[e07n17:514770] [ 1] /lib64/power9/libc.so.6(+0xad7fc)[0x20000090d7fc]
+[e07n17:514770] [ 2] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libopen-pal.so.3(opal_datatype_copy_content_same_ddt+0xc0)[0x20001699b690]
+[e07n17:514770] [ 3] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_datatype_sndrcv+0x6c0)[0x2000002db1e0]
+[e07n17:514770] [ 4] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_coll_base_alltoall_intra_basic_linear+0xb0)[0x2000003470d0]
+[e07n17:514770] [ 5] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/spectrum_mpi/mca_coll_ibm.so(mca_coll_ibm_alltoall+0x260)[0x20003a4a3420]
+[e07n17:514770] [ 6] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(MPI_Alltoall+0x1b8)[0x2000002de588]
+[e07n17:514770] [ 7] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000fe20]
+[e07n17:514770] [ 8] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10004a90]
+[e07n17:514770] [ 9] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bb24]
+[e07n17:514770] [10] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bd20]
+[e07n17:514770] [11] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10003584]
+[e07n17:514770] [12] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10002118]
+[e07n17:514770] [13] [e07n17:514768] *** Process received signal ***
+[e07n17:514768] Signal: Segmentation fault (11)
+[e07n17:514768] Signal code: Invalid permissions (2)
+[e07n17:514768] Failing at address: 0x200053200000
+[e07n17:514768] [ 0] linux-vdso64.so.1(__kernel_sigtramp_rt64+0x0)[0x2000000504d8]
+[e07n17:514768] [ 1] /lib64/power9/libc.so.6(+0xad7fc)[0x20000090d7fc]
+[e07n17:514768] [ 2] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libopen-pal.so.3(opal_datatype_copy_content_same_ddt+0xc0)[0x20001699b690]
+[e07n17:514768] [ 3] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_datatype_sndrcv+0x6c0)[0x2000002db1e0]
+[e07n17:514768] [ 4] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_coll_base_alltoall_intra_basic_linear+0xb0)[0x2000003470d0]
+[e07n17:514768] [ 5] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/spectrum_mpi/mca_coll_ibm.so(mca_coll_ibm_alltoall+0x260)[0x20003a4a3420]
+[e07n17:514768] [ 6] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(MPI_Alltoall+0x1b8)[0x2000002de588]
+[e07n17:514768] [ 7] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000fe20]
+[e07n17:514768] [ 8] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10004a90]
+[e07n17:514768] [ 9] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bb24]
+[e07n17:514768] [10] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bd20]
+[e07n17:514768] [11] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10003584]
+[e07n17:514768] [12] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10002118]
+[e07n17:514768] [13] /lib64/power9/libc.so.6(+0x24078)[0x200000884078]
+[e07n17:514768] [14] /lib64/power9/libc.so.6(__libc_start_main+0xb4)[0x200000884264]
+[e07n17:514768] *** End of error message ***
+[ 5] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/spectrum_mpi/mca_coll_ibm.so(mca_coll_ibm_alltoall+0x260)[0x20003a4a3420]
+[e07n17:514769] [ 6] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(MPI_Alltoall+0x1b8)[0x2000002de588]
+[e07n17:514769] [ 7] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000fe20]
+[e07n17:514769] [ 8] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10004a90]
+[e07n17:514769] [ 9] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bb24]
+[e07n17:514769] [10] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bd20]
+[e07n17:514769] [11] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10003584]
+[e07n17:514769] [12] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10002118]
+[e07n17:514769] [13] /lib64/power9/libc.so.6(+0x24078)[0x200000884078]
+[e07n17:514769] [14] /lib64/power9/libc.so.6(__libc_start_main+0xb4)[0x200000884264]
+[e07n17:514769] *** End of error message ***
+/lib64/power9/libc.so.6(+0x24078)[0x200000884078]
+[e07n17:514770] [14] /lib64/power9/libc.so.6(__libc_start_main+0xb4)[0x200000884264]
+[e07n17:514770] *** End of error message ***
+[e07n17:514772] *** Process received signal ***
+[e07n17:514772] Signal: Segmentation fault (11)
+[e07n17:514772] Signal code: Invalid permissions (2)
+[e07n17:514772] Failing at address: 0x200054200000
+[e07n17:514772] [ 0] linux-vdso64.so.1(__kernel_sigtramp_rt64+0x0)[0x2000000504d8]
+[e07n17:514772] [ 1] /lib64/power9/libc.so.6(+0xad7fc)[0x20000090d7fc]
+[e07n17:514772] [ 2] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libopen-pal.so.3(opal_datatype_copy_content_same_ddt+0xc0)[0x20001699b690]
+[e07n17:514772] [ 3] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_datatype_sndrcv+0x6c0)[0x2000002db1e0]
+[e07n17:514772] [ 4] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(ompi_coll_base_alltoall_intra_basic_linear+0xb0)[0x2000003470d0]
+[e07n17:514772] [ 5] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/spectrum_mpi/mca_coll_ibm.so(mca_coll_ibm_alltoall+0x260)[0x20003a4a3420]
+[e07n17:514772] [ 6] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/spectrum_mpi/mca_coll_ibm.so(mca_coll_ibm_alltoall_stub+0x244)[0x20003a499ed4]
+[e07n17:514772] [ 7] /sw/summit/spack-envs/base/opt/linux-rhel8-ppc64le/gcc-9.1.0/spectrum-mpi-10.4.0.3-20210112-6jbupg3thjwhsabgevk6xmwhd2bbyxdc/container/../lib/libmpi_ibm.so.3(MPI_Alltoall+0x1b8)[0x2000002de588]
+[e07n17:514772] [ 8] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000fe20]
+[e07n17:514772] [ 9] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10004a90]
+[e07n17:514772] [10] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bb24]
+[e07n17:514772] [11] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x1000bd20]
+[e07n17:514772] [12] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10003584]
+[e07n17:514772] [13] /ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/build/testdfft[0x10002118]
+[e07n17:514772] [14] /lib64/power9/libc.so.6(+0x24078)[0x200000884078]
+[e07n17:514772] [15] /lib64/power9/libc.so.6(__libc_start_main+0xb4)[0x200000884264]
+[e07n17:514772] *** End of error message ***
+ERROR:  One or more process (first noticed rank 2) terminated with signal 11
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@batch1>
+Subject: Job 3112549: <gpua2affttest> in cluster <summit> Exited
+
+Job <gpua2affttest> was submitted from host <login4> by user <hqureshi> in cluster <summit> at Wed Aug 16 19:13:34 2023
+Job was executed on host(s) <1*batch1>, in queue <batch>, as user <hqureshi> in cluster <summit> at Wed Aug 16 19:37:58 2023
+                            <42*e07n17>
+                            <42*e07n18>
+</ccs/home/hqureshi> was used as the home directory.
+</ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/scripts> was used as the working directory.
+Started at Wed Aug 16 19:37:58 2023
+Terminated at Wed Aug 16 19:38:22 2023
+Results reported at Wed Aug 16 19:38:22 2023
+
+The output (if any) is above this job summary.
+
