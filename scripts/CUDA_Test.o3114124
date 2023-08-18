@@ -1,0 +1,694 @@
+Testing on platform: summit
+   Compiled with CUDA
+Distribution:
+   ng              = [1024 1024 1024]
+   dims            = [8 8 8]
+   local_grid_size = [128 128 128]
+   nlocal          = 2097152
+   blockSize       = 64
+   world_size      = 512
+   using cuda mpi
+   Using MPI_Alltoall Communication!
+
+
+Rep 1/20
+
+FORWARD    max 7.660e+00s  avg 2.805e+00s  min 1.584e-01s  dev 1.412e+00s
+P1Comm     max 6.725e+00s  avg 6.990e-01s  min 1.227e-02s  dev 1.043e+00s
+P2Comm     max 5.417e+00s  avg 1.286e+00s  min 7.986e-03s  dev 1.164e+00s
+P3Comm     max 1.718e+00s  avg 6.999e-01s  min 1.530e-02s  dev 5.029e-01s
+RetComm    max 1.865e-01s  avg 1.186e-01s  min 2.726e-02s  dev 5.584e-02s
+TotComm    max 7.659e+00s  avg 2.804e+00s  min 1.570e-01s  dev 1.412e+00s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 2.134e-01s  avg 1.394e-01s  min 5.122e-02s  dev 4.395e-02s
+P1Comm     max 9.524e-03s  avg 8.467e-03s  min 6.194e-03s  dev 9.497e-04s
+P2Comm     max 1.393e-02s  avg 1.126e-02s  min 7.363e-03s  dev 1.338e-03s
+P3Comm     max 2.227e-02s  avg 1.738e-02s  min 1.468e-02s  dev 1.990e-03s
+RetComm    max 1.751e-01s  avg 1.010e-01s  min 1.285e-02s  dev 4.395e-02s
+TotComm    max 2.122e-01s  avg 1.381e-01s  min 4.999e-02s  dev 4.395e-02s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 2/20
+
+FORWARD    max 2.135e-01s  avg 1.088e-01s  min 4.967e-02s  dev 4.682e-02s
+P1Comm     max 9.485e-03s  avg 8.418e-03s  min 6.162e-03s  dev 9.667e-04s
+P2Comm     max 1.381e-02s  avg 1.144e-02s  min 5.663e-03s  dev 1.358e-03s
+P3Comm     max 2.482e-02s  avg 1.694e-02s  min 1.479e-02s  dev 2.007e-03s
+RetComm    max 1.753e-01s  avg 7.069e-02s  min 1.150e-02s  dev 4.675e-02s
+TotComm    max 2.123e-01s  avg 1.075e-01s  min 4.837e-02s  dev 4.681e-02s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 1.819e-01s  avg 7.677e-02s  min 5.040e-02s  dev 2.296e-02s
+P1Comm     max 9.676e-03s  avg 8.468e-03s  min 5.912e-03s  dev 9.699e-04s
+P2Comm     max 1.393e-02s  avg 1.162e-02s  min 7.985e-03s  dev 1.151e-03s
+P3Comm     max 2.229e-02s  avg 1.736e-02s  min 1.522e-02s  dev 1.821e-03s
+RetComm    max 1.433e-01s  avg 3.801e-02s  min 1.165e-02s  dev 2.290e-02s
+TotComm    max 1.807e-01s  avg 7.546e-02s  min 4.912e-02s  dev 2.295e-02s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 3/20
+
+FORWARD    max 8.335e-02s  avg 6.983e-02s  min 5.001e-02s  dev 8.967e-03s
+P1Comm     max 9.661e-03s  avg 8.491e-03s  min 6.186e-03s  dev 9.645e-04s
+P2Comm     max 1.387e-02s  avg 1.168e-02s  min 7.722e-03s  dev 1.149e-03s
+P3Comm     max 2.197e-02s  avg 1.703e-02s  min 1.483e-02s  dev 1.799e-03s
+RetComm    max 4.518e-02s  avg 3.132e-02s  min 1.161e-02s  dev 8.967e-03s
+TotComm    max 8.210e-02s  avg 6.853e-02s  min 4.867e-02s  dev 8.961e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.326e-02s  avg 6.982e-02s  min 4.975e-02s  dev 8.770e-03s
+P1Comm     max 9.587e-03s  avg 8.475e-03s  min 6.174e-03s  dev 9.696e-04s
+P2Comm     max 1.381e-02s  avg 1.160e-02s  min 8.102e-03s  dev 1.084e-03s
+P3Comm     max 2.257e-02s  avg 1.748e-02s  min 1.491e-02s  dev 1.785e-03s
+RetComm    max 4.440e-02s  avg 3.096e-02s  min 1.120e-02s  dev 8.848e-03s
+TotComm    max 8.208e-02s  avg 6.851e-02s  min 4.854e-02s  dev 8.766e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 4/20
+
+FORWARD    max 8.302e-02s  avg 6.950e-02s  min 4.986e-02s  dev 8.887e-03s
+P1Comm     max 9.595e-03s  avg 8.480e-03s  min 5.755e-03s  dev 9.736e-04s
+P2Comm     max 1.383e-02s  avg 1.159e-02s  min 7.897e-03s  dev 1.152e-03s
+P3Comm     max 2.150e-02s  avg 1.682e-02s  min 1.483e-02s  dev 1.840e-03s
+RetComm    max 4.508e-02s  avg 3.130e-02s  min 1.163e-02s  dev 8.882e-03s
+TotComm    max 8.180e-02s  avg 6.820e-02s  min 4.852e-02s  dev 8.882e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.317e-02s  avg 6.962e-02s  min 4.986e-02s  dev 8.977e-03s
+P1Comm     max 9.603e-03s  avg 8.449e-03s  min 5.718e-03s  dev 9.847e-04s
+P2Comm     max 1.359e-02s  avg 1.160e-02s  min 7.942e-03s  dev 1.134e-03s
+P3Comm     max 2.192e-02s  avg 1.713e-02s  min 1.465e-02s  dev 1.837e-03s
+RetComm    max 4.486e-02s  avg 3.114e-02s  min 1.118e-02s  dev 9.011e-03s
+TotComm    max 8.191e-02s  avg 6.831e-02s  min 4.855e-02s  dev 8.972e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 5/20
+
+FORWARD    max 8.321e-02s  avg 6.977e-02s  min 5.038e-02s  dev 8.935e-03s
+P1Comm     max 9.621e-03s  avg 8.492e-03s  min 6.202e-03s  dev 9.669e-04s
+P2Comm     max 1.365e-02s  avg 1.156e-02s  min 7.557e-03s  dev 1.132e-03s
+P3Comm     max 2.195e-02s  avg 1.726e-02s  min 1.501e-02s  dev 1.819e-03s
+RetComm    max 4.490e-02s  avg 3.116e-02s  min 1.128e-02s  dev 8.995e-03s
+TotComm    max 8.195e-02s  avg 6.847e-02s  min 4.905e-02s  dev 8.929e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.292e-02s  avg 6.938e-02s  min 4.970e-02s  dev 8.909e-03s
+P1Comm     max 9.586e-03s  avg 8.456e-03s  min 5.768e-03s  dev 9.865e-04s
+P2Comm     max 1.357e-02s  avg 1.153e-02s  min 8.184e-03s  dev 1.147e-03s
+P3Comm     max 2.169e-02s  avg 1.702e-02s  min 1.475e-02s  dev 1.876e-03s
+RetComm    max 4.522e-02s  avg 3.107e-02s  min 1.107e-02s  dev 8.895e-03s
+TotComm    max 8.170e-02s  avg 6.808e-02s  min 4.835e-02s  dev 8.904e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 6/20
+
+FORWARD    max 8.280e-02s  avg 6.950e-02s  min 5.000e-02s  dev 9.085e-03s
+P1Comm     max 9.641e-03s  avg 8.474e-03s  min 6.191e-03s  dev 9.679e-04s
+P2Comm     max 1.394e-02s  avg 1.163e-02s  min 8.151e-03s  dev 1.066e-03s
+P3Comm     max 2.154e-02s  avg 1.707e-02s  min 1.485e-02s  dev 1.725e-03s
+RetComm    max 4.495e-02s  avg 3.104e-02s  min 1.151e-02s  dev 9.099e-03s
+TotComm    max 8.157e-02s  avg 6.820e-02s  min 4.871e-02s  dev 9.080e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.365e-02s  avg 6.994e-02s  min 5.033e-02s  dev 9.047e-03s
+P1Comm     max 9.601e-03s  avg 8.489e-03s  min 5.999e-03s  dev 9.783e-04s
+P2Comm     max 1.376e-02s  avg 1.149e-02s  min 7.803e-03s  dev 1.141e-03s
+P3Comm     max 2.289e-02s  avg 1.752e-02s  min 1.503e-02s  dev 1.888e-03s
+RetComm    max 4.461e-02s  avg 3.114e-02s  min 1.156e-02s  dev 9.000e-03s
+TotComm    max 8.223e-02s  avg 6.863e-02s  min 4.899e-02s  dev 9.042e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 7/20
+
+FORWARD    max 8.283e-02s  avg 6.961e-02s  min 4.990e-02s  dev 8.704e-03s
+P1Comm     max 9.614e-03s  avg 8.450e-03s  min 5.740e-03s  dev 9.797e-04s
+P2Comm     max 1.382e-02s  avg 1.155e-02s  min 7.585e-03s  dev 1.187e-03s
+P3Comm     max 2.180e-02s  avg 1.715e-02s  min 1.479e-02s  dev 1.870e-03s
+RetComm    max 4.490e-02s  avg 3.116e-02s  min 1.133e-02s  dev 8.776e-03s
+TotComm    max 8.155e-02s  avg 6.831e-02s  min 4.854e-02s  dev 8.700e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.353e-02s  avg 6.965e-02s  min 4.942e-02s  dev 9.054e-03s
+P1Comm     max 9.590e-03s  avg 8.485e-03s  min 5.746e-03s  dev 9.826e-04s
+P2Comm     max 1.366e-02s  avg 1.155e-02s  min 7.543e-03s  dev 1.199e-03s
+P3Comm     max 2.201e-02s  avg 1.697e-02s  min 1.482e-02s  dev 1.908e-03s
+RetComm    max 4.512e-02s  avg 3.134e-02s  min 1.130e-02s  dev 8.974e-03s
+TotComm    max 8.230e-02s  avg 6.834e-02s  min 4.813e-02s  dev 9.048e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 8/20
+
+FORWARD    max 8.326e-02s  avg 6.996e-02s  min 5.078e-02s  dev 9.053e-03s
+P1Comm     max 9.526e-03s  avg 8.471e-03s  min 5.771e-03s  dev 9.760e-04s
+P2Comm     max 1.404e-02s  avg 1.167e-02s  min 8.280e-03s  dev 1.092e-03s
+P3Comm     max 2.234e-02s  avg 1.741e-02s  min 1.522e-02s  dev 1.784e-03s
+RetComm    max 4.467e-02s  avg 3.110e-02s  min 1.176e-02s  dev 9.042e-03s
+TotComm    max 8.205e-02s  avg 6.866e-02s  min 4.942e-02s  dev 9.048e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.287e-02s  avg 6.958e-02s  min 4.936e-02s  dev 9.059e-03s
+P1Comm     max 9.483e-03s  avg 8.450e-03s  min 5.666e-03s  dev 9.810e-04s
+P2Comm     max 1.343e-02s  avg 1.145e-02s  min 7.719e-03s  dev 1.176e-03s
+P3Comm     max 2.181e-02s  avg 1.707e-02s  min 1.484e-02s  dev 1.910e-03s
+RetComm    max 4.473e-02s  avg 3.130e-02s  min 1.119e-02s  dev 9.088e-03s
+TotComm    max 8.166e-02s  avg 6.828e-02s  min 4.804e-02s  dev 9.054e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 9/20
+
+FORWARD    max 8.308e-02s  avg 6.948e-02s  min 4.969e-02s  dev 9.071e-03s
+P1Comm     max 9.601e-03s  avg 8.461e-03s  min 5.787e-03s  dev 9.719e-04s
+P2Comm     max 1.377e-02s  avg 1.155e-02s  min 7.063e-03s  dev 1.141e-03s
+P3Comm     max 2.294e-02s  avg 1.707e-02s  min 1.509e-02s  dev 1.838e-03s
+RetComm    max 4.442e-02s  avg 3.109e-02s  min 1.146e-02s  dev 8.999e-03s
+TotComm    max 8.178e-02s  avg 6.818e-02s  min 4.840e-02s  dev 9.066e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.298e-02s  avg 6.971e-02s  min 4.986e-02s  dev 9.014e-03s
+P1Comm     max 1.014e-02s  avg 8.475e-03s  min 5.984e-03s  dev 9.857e-04s
+P2Comm     max 1.378e-02s  avg 1.135e-02s  min 6.982e-03s  dev 1.213e-03s
+P3Comm     max 2.396e-02s  avg 1.742e-02s  min 1.492e-02s  dev 1.948e-03s
+RetComm    max 4.482e-02s  avg 3.116e-02s  min 1.137e-02s  dev 8.989e-03s
+TotComm    max 8.174e-02s  avg 6.841e-02s  min 4.857e-02s  dev 9.009e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 10/20
+
+FORWARD    max 8.301e-02s  avg 6.954e-02s  min 4.940e-02s  dev 8.944e-03s
+P1Comm     max 9.591e-03s  avg 8.476e-03s  min 5.825e-03s  dev 9.750e-04s
+P2Comm     max 1.375e-02s  avg 1.154e-02s  min 7.956e-03s  dev 1.098e-03s
+P3Comm     max 2.177e-02s  avg 1.702e-02s  min 1.458e-02s  dev 1.796e-03s
+RetComm    max 4.497e-02s  avg 3.121e-02s  min 1.126e-02s  dev 8.959e-03s
+TotComm    max 8.181e-02s  avg 6.824e-02s  min 4.817e-02s  dev 8.938e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.271e-02s  avg 6.957e-02s  min 4.936e-02s  dev 8.914e-03s
+P1Comm     max 9.551e-03s  avg 8.441e-03s  min 5.980e-03s  dev 9.889e-04s
+P2Comm     max 1.381e-02s  avg 1.161e-02s  min 7.556e-03s  dev 1.109e-03s
+P3Comm     max 2.226e-02s  avg 1.685e-02s  min 1.460e-02s  dev 1.839e-03s
+RetComm    max 4.489e-02s  avg 3.136e-02s  min 1.103e-02s  dev 8.957e-03s
+TotComm    max 8.141e-02s  avg 6.827e-02s  min 4.807e-02s  dev 8.909e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 11/20
+
+FORWARD    max 8.271e-02s  avg 6.955e-02s  min 4.954e-02s  dev 8.980e-03s
+P1Comm     max 9.561e-03s  avg 8.479e-03s  min 6.174e-03s  dev 9.705e-04s
+P2Comm     max 1.343e-02s  avg 1.165e-02s  min 8.139e-03s  dev 1.071e-03s
+P3Comm     max 2.129e-02s  avg 1.697e-02s  min 1.466e-02s  dev 1.745e-03s
+RetComm    max 4.482e-02s  avg 3.115e-02s  min 1.101e-02s  dev 9.013e-03s
+TotComm    max 8.144e-02s  avg 6.825e-02s  min 4.820e-02s  dev 8.975e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.393e-02s  avg 7.005e-02s  min 5.042e-02s  dev 8.983e-03s
+P1Comm     max 9.692e-03s  avg 8.461e-03s  min 5.753e-03s  dev 9.799e-04s
+P2Comm     max 1.373e-02s  avg 1.150e-02s  min 7.664e-03s  dev 1.169e-03s
+P3Comm     max 2.264e-02s  avg 1.763e-02s  min 1.474e-02s  dev 1.888e-03s
+RetComm    max 4.511e-02s  avg 3.117e-02s  min 1.172e-02s  dev 8.906e-03s
+TotComm    max 8.271e-02s  avg 6.875e-02s  min 4.909e-02s  dev 8.978e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 12/20
+
+FORWARD    max 8.331e-02s  avg 6.967e-02s  min 4.982e-02s  dev 8.922e-03s
+P1Comm     max 9.598e-03s  avg 8.461e-03s  min 5.674e-03s  dev 9.774e-04s
+P2Comm     max 1.397e-02s  avg 1.165e-02s  min 7.798e-03s  dev 1.105e-03s
+P3Comm     max 2.253e-02s  avg 1.725e-02s  min 1.457e-02s  dev 1.818e-03s
+RetComm    max 4.485e-02s  avg 3.102e-02s  min 1.130e-02s  dev 8.924e-03s
+TotComm    max 8.207e-02s  avg 6.837e-02s  min 4.854e-02s  dev 8.917e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.321e-02s  avg 6.982e-02s  min 4.987e-02s  dev 8.797e-03s
+P1Comm     max 9.707e-03s  avg 8.444e-03s  min 5.971e-03s  dev 9.874e-04s
+P2Comm     max 1.345e-02s  avg 1.168e-02s  min 7.698e-03s  dev 1.068e-03s
+P3Comm     max 2.239e-02s  avg 1.729e-02s  min 1.478e-02s  dev 1.777e-03s
+RetComm    max 4.472e-02s  avg 3.111e-02s  min 1.049e-02s  dev 8.948e-03s
+TotComm    max 8.196e-02s  avg 6.852e-02s  min 4.847e-02s  dev 8.792e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 13/20
+
+FORWARD    max 8.357e-02s  avg 7.020e-02s  min 4.984e-02s  dev 8.772e-03s
+P1Comm     max 9.673e-03s  avg 8.453e-03s  min 5.864e-03s  dev 9.831e-04s
+P2Comm     max 1.398e-02s  avg 1.165e-02s  min 7.708e-03s  dev 1.138e-03s
+P3Comm     max 2.245e-02s  avg 1.746e-02s  min 1.489e-02s  dev 1.824e-03s
+RetComm    max 4.493e-02s  avg 3.133e-02s  min 1.110e-02s  dev 8.822e-03s
+TotComm    max 8.229e-02s  avg 6.890e-02s  min 4.858e-02s  dev 8.766e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.337e-02s  avg 7.009e-02s  min 5.049e-02s  dev 9.007e-03s
+P1Comm     max 9.531e-03s  avg 8.467e-03s  min 5.767e-03s  dev 9.722e-04s
+P2Comm     max 1.378e-02s  avg 1.159e-02s  min 7.412e-03s  dev 1.083e-03s
+P3Comm     max 2.268e-02s  avg 1.745e-02s  min 1.531e-02s  dev 1.799e-03s
+RetComm    max 4.500e-02s  avg 3.129e-02s  min 1.162e-02s  dev 8.976e-03s
+TotComm    max 8.212e-02s  avg 6.879e-02s  min 4.909e-02s  dev 9.002e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 14/20
+
+FORWARD    max 8.290e-02s  avg 6.962e-02s  min 4.972e-02s  dev 8.869e-03s
+P1Comm     max 9.612e-03s  avg 8.447e-03s  min 5.926e-03s  dev 9.842e-04s
+P2Comm     max 1.388e-02s  avg 1.158e-02s  min 8.164e-03s  dev 1.056e-03s
+P3Comm     max 2.154e-02s  avg 1.716e-02s  min 1.488e-02s  dev 1.752e-03s
+RetComm    max 4.475e-02s  avg 3.113e-02s  min 1.101e-02s  dev 8.861e-03s
+TotComm    max 8.159e-02s  avg 6.832e-02s  min 4.845e-02s  dev 8.864e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.275e-02s  avg 6.955e-02s  min 4.974e-02s  dev 8.904e-03s
+P1Comm     max 9.653e-03s  avg 8.415e-03s  min 5.682e-03s  dev 9.899e-04s
+P2Comm     max 1.387e-02s  avg 1.155e-02s  min 7.795e-03s  dev 1.121e-03s
+P3Comm     max 2.199e-02s  avg 1.715e-02s  min 1.459e-02s  dev 1.816e-03s
+RetComm    max 4.458e-02s  avg 3.113e-02s  min 1.145e-02s  dev 8.930e-03s
+TotComm    max 8.149e-02s  avg 6.825e-02s  min 4.840e-02s  dev 8.899e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 15/20
+
+FORWARD    max 8.329e-02s  avg 6.978e-02s  min 4.961e-02s  dev 8.917e-03s
+P1Comm     max 9.555e-03s  avg 8.440e-03s  min 5.667e-03s  dev 9.875e-04s
+P2Comm     max 1.385e-02s  avg 1.155e-02s  min 8.042e-03s  dev 1.143e-03s
+P3Comm     max 2.199e-02s  avg 1.729e-02s  min 1.465e-02s  dev 1.859e-03s
+RetComm    max 4.474e-02s  avg 3.120e-02s  min 1.099e-02s  dev 8.923e-03s
+TotComm    max 8.197e-02s  avg 6.848e-02s  min 4.834e-02s  dev 8.913e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.284e-02s  avg 6.963e-02s  min 4.962e-02s  dev 8.866e-03s
+P1Comm     max 9.567e-03s  avg 8.467e-03s  min 5.775e-03s  dev 9.712e-04s
+P2Comm     max 1.364e-02s  avg 1.155e-02s  min 7.927e-03s  dev 1.126e-03s
+P3Comm     max 2.155e-02s  avg 1.700e-02s  min 1.477e-02s  dev 1.838e-03s
+RetComm    max 4.466e-02s  avg 3.130e-02s  min 1.144e-02s  dev 8.886e-03s
+TotComm    max 8.158e-02s  avg 6.832e-02s  min 4.827e-02s  dev 8.861e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 16/20
+
+FORWARD    max 8.283e-02s  avg 6.927e-02s  min 4.968e-02s  dev 8.938e-03s
+P1Comm     max 9.633e-03s  avg 8.450e-03s  min 5.759e-03s  dev 9.779e-04s
+P2Comm     max 1.395e-02s  avg 1.160e-02s  min 7.660e-03s  dev 1.117e-03s
+P3Comm     max 2.135e-02s  avg 1.683e-02s  min 1.451e-02s  dev 1.766e-03s
+RetComm    max 4.481e-02s  avg 3.109e-02s  min 1.135e-02s  dev 8.922e-03s
+TotComm    max 8.164e-02s  avg 6.797e-02s  min 4.829e-02s  dev 8.933e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.265e-02s  avg 6.949e-02s  min 4.969e-02s  dev 9.025e-03s
+P1Comm     max 9.516e-03s  avg 8.438e-03s  min 5.770e-03s  dev 9.884e-04s
+P2Comm     max 1.331e-02s  avg 1.150e-02s  min 7.323e-03s  dev 1.177e-03s
+P3Comm     max 2.190e-02s  avg 1.695e-02s  min 1.464e-02s  dev 1.941e-03s
+RetComm    max 4.471e-02s  avg 3.131e-02s  min 1.149e-02s  dev 9.009e-03s
+TotComm    max 8.140e-02s  avg 6.819e-02s  min 4.833e-02s  dev 9.020e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 17/20
+
+FORWARD    max 8.337e-02s  avg 6.957e-02s  min 5.009e-02s  dev 8.963e-03s
+P1Comm     max 9.612e-03s  avg 8.470e-03s  min 5.678e-03s  dev 9.748e-04s
+P2Comm     max 1.394e-02s  avg 1.163e-02s  min 7.637e-03s  dev 1.123e-03s
+P3Comm     max 2.196e-02s  avg 1.720e-02s  min 1.446e-02s  dev 1.820e-03s
+RetComm    max 4.464e-02s  avg 3.097e-02s  min 1.171e-02s  dev 8.931e-03s
+TotComm    max 8.215e-02s  avg 6.827e-02s  min 4.878e-02s  dev 8.959e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.275e-02s  avg 6.933e-02s  min 4.936e-02s  dev 8.943e-03s
+P1Comm     max 9.604e-03s  avg 8.448e-03s  min 6.220e-03s  dev 9.801e-04s
+P2Comm     max 1.381e-02s  avg 1.152e-02s  min 7.912e-03s  dev 1.117e-03s
+P3Comm     max 2.198e-02s  avg 1.687e-02s  min 1.435e-02s  dev 1.854e-03s
+RetComm    max 4.498e-02s  avg 3.119e-02s  min 1.115e-02s  dev 8.969e-03s
+TotComm    max 8.147e-02s  avg 6.803e-02s  min 4.815e-02s  dev 8.938e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 18/20
+
+FORWARD    max 8.263e-02s  avg 6.955e-02s  min 4.943e-02s  dev 8.813e-03s
+P1Comm     max 9.522e-03s  avg 8.451e-03s  min 5.711e-03s  dev 9.740e-04s
+P2Comm     max 1.364e-02s  avg 1.157e-02s  min 8.125e-03s  dev 1.094e-03s
+P3Comm     max 2.212e-02s  avg 1.716e-02s  min 1.485e-02s  dev 1.799e-03s
+RetComm    max 4.442e-02s  avg 3.107e-02s  min 1.099e-02s  dev 8.892e-03s
+TotComm    max 8.137e-02s  avg 6.825e-02s  min 4.813e-02s  dev 8.809e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.315e-02s  avg 6.972e-02s  min 5.011e-02s  dev 8.834e-03s
+P1Comm     max 9.617e-03s  avg 8.417e-03s  min 5.843e-03s  dev 9.876e-04s
+P2Comm     max 1.373e-02s  avg 1.152e-02s  min 7.611e-03s  dev 1.149e-03s
+P3Comm     max 2.267e-02s  avg 1.726e-02s  min 1.481e-02s  dev 1.858e-03s
+RetComm    max 4.511e-02s  avg 3.122e-02s  min 1.141e-02s  dev 8.852e-03s
+TotComm    max 8.196e-02s  avg 6.842e-02s  min 4.875e-02s  dev 8.829e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 19/20
+
+FORWARD    max 8.311e-02s  avg 6.931e-02s  min 4.976e-02s  dev 9.063e-03s
+P1Comm     max 9.563e-03s  avg 8.456e-03s  min 5.763e-03s  dev 9.814e-04s
+P2Comm     max 1.368e-02s  avg 1.152e-02s  min 8.080e-03s  dev 1.118e-03s
+P3Comm     max 2.152e-02s  avg 1.696e-02s  min 1.492e-02s  dev 1.823e-03s
+RetComm    max 4.506e-02s  avg 3.108e-02s  min 1.164e-02s  dev 9.060e-03s
+TotComm    max 8.188e-02s  avg 6.801e-02s  min 4.841e-02s  dev 9.058e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.281e-02s  avg 6.963e-02s  min 4.988e-02s  dev 8.903e-03s
+P1Comm     max 9.529e-03s  avg 8.446e-03s  min 5.870e-03s  dev 9.832e-04s
+P2Comm     max 1.385e-02s  avg 1.159e-02s  min 8.073e-03s  dev 1.095e-03s
+P3Comm     max 2.246e-02s  avg 1.717e-02s  min 1.479e-02s  dev 1.815e-03s
+RetComm    max 4.512e-02s  avg 3.112e-02s  min 1.116e-02s  dev 8.958e-03s
+TotComm    max 8.155e-02s  avg 6.832e-02s  min 4.863e-02s  dev 8.898e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+
+Rep 20/20
+
+FORWARD    max 8.289e-02s  avg 6.925e-02s  min 4.917e-02s  dev 9.097e-03s
+P1Comm     max 9.595e-03s  avg 8.458e-03s  min 5.845e-03s  dev 9.738e-04s
+P2Comm     max 1.381e-02s  avg 1.165e-02s  min 7.925e-03s  dev 1.100e-03s
+P3Comm     max 2.131e-02s  avg 1.674e-02s  min 1.476e-02s  dev 1.791e-03s
+RetComm    max 4.513e-02s  avg 3.110e-02s  min 1.126e-02s  dev 9.050e-03s
+TotComm    max 8.168e-02s  avg 6.795e-02s  min 4.779e-02s  dev 9.091e-03s
+
+k-space:
+real in [1.000000e+00,1.000000e+00] = [3ff0000000000000,3ff0000000000000]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+BACKWARD   max 8.283e-02s  avg 6.952e-02s  min 4.971e-02s  dev 9.035e-03s
+P1Comm     max 9.596e-03s  avg 8.447e-03s  min 5.784e-03s  dev 9.838e-04s
+P2Comm     max 1.374e-02s  avg 1.157e-02s  min 7.969e-03s  dev 1.143e-03s
+P3Comm     max 2.200e-02s  avg 1.702e-02s  min 1.475e-02s  dev 1.848e-03s
+RetComm    max 4.483e-02s  avg 3.118e-02s  min 1.135e-02s  dev 9.000e-03s
+TotComm    max 8.162e-02s  avg 6.821e-02s  min 4.842e-02s  dev 9.031e-03s
+
+r-space:
+a[0,0,0] = 1073741824.000000,0.000000 = (1073741824.000000,0.000000)
+real in [0.000000e+00,0.000000e+00] = [0,0]
+imag in [0.000000e+00,0.000000e+00] = [0,0]
+
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@batch2>
+Subject: Job 3114124: <gpua2affttest> in cluster <summit> Done
+
+Job <gpua2affttest> was submitted from host <login2> by user <hqureshi> in cluster <summit> at Thu Aug 17 22:24:12 2023
+Job was executed on host(s) <1*batch2>, in queue <batch>, as user <hqureshi> in cluster <summit> at Thu Aug 17 22:28:53 2023
+                            <42*c06n07>
+                            <42*c06n08>
+                            <42*c06n09>
+                            <42*c06n10>
+                            <42*c06n11>
+                            <42*c06n12>
+                            <42*c06n13>
+                            <42*c06n14>
+                            <42*c06n15>
+                            <42*c06n16>
+                            <42*c06n17>
+                            <42*c06n18>
+                            <42*c07n01>
+                            <42*c07n02>
+                            <42*c07n03>
+                            <42*c07n04>
+                            <42*c07n05>
+                            <42*c07n06>
+                            <42*c07n07>
+                            <42*c07n08>
+                            <42*c07n09>
+                            <42*c07n10>
+                            <42*c07n11>
+                            <42*c07n12>
+                            <42*c07n13>
+                            <42*c07n14>
+                            <42*c07n15>
+                            <42*c07n16>
+                            <42*c07n17>
+                            <42*c07n18>
+                            <42*c08n01>
+                            <42*c08n02>
+                            <42*c08n03>
+                            <42*c08n04>
+                            <42*c08n05>
+                            <42*c08n06>
+                            <42*c08n07>
+                            <42*c08n08>
+                            <42*c08n09>
+                            <42*c08n10>
+                            <42*c08n11>
+                            <42*c08n12>
+                            <42*c08n13>
+                            <42*c08n14>
+                            <42*c08n15>
+                            <42*c08n16>
+                            <42*c08n17>
+                            <42*c08n18>
+                            <42*c09n01>
+                            <42*c09n02>
+                            <42*c09n03>
+                            <42*c09n04>
+                            <42*c09n05>
+                            <42*c09n06>
+                            <42*c09n07>
+                            <42*c09n08>
+                            <42*c09n09>
+                            <42*c09n10>
+                            <42*c09n11>
+                            <42*c09n12>
+                            <42*c09n13>
+                            <42*c09n14>
+                            <42*c09n15>
+                            <42*c09n16>
+                            <42*c09n17>
+                            <42*c09n18>
+                            <42*c10n01>
+                            <42*c10n02>
+                            <42*c10n03>
+                            <42*c10n04>
+                            <42*c10n05>
+                            <42*c10n06>
+                            <42*c10n07>
+                            <42*c10n08>
+                            <42*c10n09>
+                            <42*c10n10>
+                            <42*c10n11>
+                            <42*c10n12>
+                            <42*c10n13>
+                            <42*c10n14>
+                            <42*c10n15>
+                            <42*c10n16>
+                            <42*c10n17>
+                            <42*c10n18>
+                            <42*c11n01>
+                            <42*c11n02>
+                            <42*c11n03>
+                            <42*c11n04>
+                            <42*c11n05>
+                            <42*c11n06>
+                            <42*c11n07>
+                            <42*c11n08>
+                            <42*c11n09>
+                            <42*c11n10>
+                            <42*c11n11>
+                            <42*c11n12>
+                            <42*c11n13>
+                            <42*c11n14>
+                            <42*c11n15>
+                            <42*c11n16>
+                            <42*c11n17>
+                            <42*c11n18>
+                            <42*c12n01>
+                            <42*c12n02>
+                            <42*c12n03>
+                            <42*c12n04>
+                            <42*c12n05>
+                            <42*c12n06>
+                            <42*c12n07>
+                            <42*c12n08>
+                            <42*c12n09>
+                            <42*e12n17>
+                            <42*e12n18>
+                            <42*e13n01>
+                            <42*e13n02>
+                            <42*e13n03>
+                            <42*e13n04>
+                            <42*e13n05>
+                            <42*e13n06>
+                            <42*e13n07>
+                            <42*e13n08>
+                            <42*e13n09>
+                            <42*e13n10>
+                            <42*e13n11>
+                            <42*e13n12>
+                            <42*e13n13>
+                            <42*e13n14>
+                            <42*e13n15>
+</ccs/home/hqureshi> was used as the home directory.
+</ccs/home/hqureshi/Humza-s-Epic-3D-FFT-Code/scripts> was used as the working directory.
+Started at Thu Aug 17 22:28:53 2023
+Terminated at Thu Aug 17 22:29:38 2023
+Results reported at Thu Aug 17 22:29:38 2023
+
+The output (if any) is above this job summary.
+

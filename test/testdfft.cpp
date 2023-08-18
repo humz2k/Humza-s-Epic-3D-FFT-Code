@@ -193,7 +193,7 @@ int main(int argc, char** argv){
     if(world_rank == 0)printf("   Compiled with HIP\n");
     #endif
 
-    test<complexDouble,PairSends>(ng,ng,ng,blockSize,reps);
+    test<complexDouble,AllToAll>(ng,ng,ng,blockSize,reps);
 
     MPI_Finalize();
     return 0;
