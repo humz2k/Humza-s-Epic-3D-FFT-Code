@@ -22,6 +22,6 @@ def check(ng,dims):
         return False
 
 #print(check(960,np.array([3,2,2])))
-print(check(12288,MPI.Compute_dims(24576,3)))
-print(check(1024,MPI.Compute_dims(8192,3)))
-print(MPI.Compute_dims(512,3))
+#print(check(12288,MPI.Compute_dims(24576,3)))
+print(check(7680,MPI.Compute_dims(6144,3)))
+#print(MPI.Compute_dims(512,3))
