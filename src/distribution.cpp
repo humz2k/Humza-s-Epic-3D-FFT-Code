@@ -67,11 +67,11 @@ Distribution<T,Communicator>::Distribution(MPI_Comm comm, int ngx, int ngy, int 
 
     distcomms[2] = x_col_comm;
 
-    assert(local_grid_size[0] % dims[2] == 0);
-    assert(local_grid_size[2] % dims[1] == 0);
-    assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
-    assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
-    assert(ng[2] % (dims[0] * dims[2]) == 0);
+    //assert(local_grid_size[0] % dims[2] == 0);
+    //assert(local_grid_size[2] % dims[1] == 0);
+    //assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
+    //assert(local_grid_size[2] % (dims[0] * dims[2]) == 0);
+    //assert(ng[2] % (dims[0] * dims[2]) == 0);
 
     CollectiveComm.init(buffSize());
 

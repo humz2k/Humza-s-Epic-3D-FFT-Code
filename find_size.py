@@ -1,6 +1,8 @@
 import numpy as np
+import mpi4py.MPI as MPI
 
 def check(ng,dims):
+    dims = np.array(dims)
     local_dims = ng / dims
     if np.sum(local_dims == local_dims.astype(int)) != 3:
         return False
@@ -12,11 +14,14 @@ def check(ng,dims):
         return False
     if (nlocal % (dims[0] * dims[2])) != 0:
         return False
-    if (local_dims[1] % dims[2]) != 0:
+    if (local_dims[0] % dims[2]) != 0:
         return False
     if (ng % dims[1]) != 0:
         return False
     if (ng % (dims[0] * dims[2])) != 0:
         return False
 
-print(check(960,np.array([3,2,2])))
+#print(check(960,np.array([3,2,2])))
+print(check(12288,MPI.Compute_dims(24576,3)))
+print(check(1024,MPI.Compute_dims(8192,3)))
+print(MPI.Compute_dims(512,3))
